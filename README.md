@@ -4,16 +4,16 @@ This file uses Mark Down syntax. For more information see [here](https://www.mar
 
 [//]: # (TODO: Fill inn your name and student ID)
 
-STUDENT NAME = "Your name"  
-STUDENT ID = "Your ID"
+STUDENT NAME = "Hector Mendana Morales"  
+STUDENT ID = ""
 
 ## Project description
 
-[//]: # (TODO: Write a short description of your project/product here.)
+[//]: Kitchen program
 
 ## Project structure
 
-[//]: # (TODO: Describe the structure of your project here. How have you used packages in your structure. Where are all sourcefiles stored. Where are all JUnit-test classes stored. etc.)
+[//]: Raw code
 
 ## Link to repository
 
