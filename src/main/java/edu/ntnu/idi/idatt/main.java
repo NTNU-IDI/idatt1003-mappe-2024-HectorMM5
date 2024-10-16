@@ -1,3 +1,5 @@
+
+
 public class main {
 
     public class grocery {
@@ -48,6 +50,41 @@ public class main {
         }
 
 
+    }
+
+    public grocery[] ingredients = {};
+
+
+    public void search(String argument) {
+        for (int i = 0; i <= ingredients.length-1; i++) {
+            if (ingredients[i].name == argument) {
+                System.out.println("Ingrediensen " + ingredients[i].name + " finnes, du har " + ingredients[i].amount + " " + ingredients[i].unit + ".");
+            }
+
+            else if (i == ingredients.length-1) {
+                System.out.println("Ingrediensen du leter etter finnes ikke.");
+            }
+        }
+    }
+
+    public void use(String argument, double consume) {
+        for (int i = 0; i <= ingredients.length-1; i++) {
+            if (ingredients[i].name == argument) {
+                if (ingredients[i].amount > consume) {
+                    ingredients[i].amount -= consume;
+                    System.out.println("Du tar ut " + consume + " " + ingredients[i].unit + " " + ingredients[i].name + ", og har " + ingredients[i].amount + " " + ingredients[i].unit + " igjen.");
+                }
+
+                else {
+                    System.out.println("Du har ikke nok " + ingredients[i].name + " til dette.");
+                }
+                
+            }
+
+            else if (i == ingredients.length-1) {
+                System.out.println("Ingrediensen du leter etter finnes ikke.");
+            }
+        }
     }
 
     public void help() {
