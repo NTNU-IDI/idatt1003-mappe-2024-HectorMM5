@@ -15,6 +15,13 @@ public class grocery {
 
     }
 
+    public grocery(String name, String unit, float amount) {
+        this.name = name;
+        this.unit = unit;
+        this.amount = amount;
+
+    }
+
     public String getName() {
         return this.name;
     }
