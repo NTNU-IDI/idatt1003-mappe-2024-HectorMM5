@@ -74,7 +74,7 @@ public class cookBook {
 
     }
 
-    public void recipeCheck() {
+    public void recipe() {
 
     }
 }
