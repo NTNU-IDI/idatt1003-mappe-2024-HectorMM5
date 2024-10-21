@@ -49,13 +49,13 @@ public class fridge {
         }
 
         ingredients.add(new grocery(name, unit, amount, cost, expiryDate));
-        System.out.println("The grocery item has been added successfully.");
+        System.out.println("Your grocery has been put in the fridge.");
     }
 
     public void use(String argument, float consume) {
-        for (int i = 0; i <= ingredients.size()-1; i++) {
+        for (int i = 0; i < ingredients.size(); i++) {
             if (ingredients.get(i).getName().equals(argument)) {
-                if (ingredients.get(i).getAmount() > consume) {
+                if (ingredients.get(i).getAmount() >= consume) {
                     ingredients.get(i).setAmount(ingredients.get(i).getAmount() - consume);
                     System.out.println("Du tar ut " + consume + " " + ingredients.get(i).getUnit() + " " + ingredients.get(i).getName() + ", og har " + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + " igjen.");
                 }
@@ -73,7 +73,7 @@ public class fridge {
     }
 
     public void search(String argument) {
-        for (int i = 0; i <= ingredients.size()-1; i++) {
+        for (int i = 0; i < ingredients.size(); i++) {
             if (ingredients.get(i).getName().equals(argument)) {
                 System.out.println("Ingrediensen " + ingredients.get(i).getName() + " finnes, du har " + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + ".");
             }
@@ -85,13 +85,13 @@ public class fridge {
     } 
 
     public void overview() {
-        for (int i = 0; i <= ingredients.size()-1; i++) {
+        for (int i = 0; i < ingredients.size(); i++) {
             System.out.println(ingredients.get(i).getName() + ": " + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + ".");
         }
     }
 
     public void dateOverview() {
-        for (int i = 0; i <= ingredients.size()-1; i++) {
+        for (int i = 0; i < ingredients.size(); i++) {
             if (ingredients.get(i).getExpiryDate() > 111111) {
                 System.out.println(ingredients.get(i).getName() + ": " + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + ".");
             }
@@ -101,7 +101,7 @@ public class fridge {
     public void value() {
 
         float value = 0f;
-        for (int i = 0; i <= ingredients.size()-1; i++) {
+        for (int i = 0; i < ingredients.size(); i++) {
             value += ingredients.get(i).getCost() * ingredients.get(i).getAmount();
         }
 

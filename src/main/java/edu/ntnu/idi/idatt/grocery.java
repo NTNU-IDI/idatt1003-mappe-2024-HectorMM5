@@ -10,7 +10,7 @@ public class grocery {
         this.name = name;
         this.unit = unit;
         this.amount = amount;
-        this.cost = cost;
+        this.cost = cost/this.amount;
         this.expiryDate = expiryDate;
 
     }
@@ -34,7 +34,7 @@ public class grocery {
         return this.amount;
     }
 
-    public int getCost() {
+    public float getCost() {
         return this.cost;
     }
 

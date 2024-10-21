@@ -4,6 +4,7 @@ public class main {
     public static void main(String[] args) {
         fridge fridge = new fridge();
         Scanner scanner = new Scanner(System.in);
+        cookBook cookBook = new cookBook();
 
         System.out.println("Welcome to the fridge, write /help for all commands.");
 
@@ -11,6 +12,7 @@ public class main {
 
         while (true) {
             input = scanner.nextLine();
+            String input2;
 
             switch (input) {
                 case "/newItem":
@@ -18,23 +20,41 @@ public class main {
                     break;
 
                 case "/use":
-                    System.out.println("Retrieving an item...");
+                    System.out.println("Write the name of the grocery you want to use:");
+                    input2 = scanner.nextLine();
+
+                    System.out.println("Write the amount of the grocery you want to use:");
+                    float amount = Float.parseFloat(scanner.nextLine());
+
+                    try {
+                        fridge.use(input2, amount);
+                        
+                    } 
+                    
+                    catch (Exception e) {
+                        System.out.println("Something went wrong. The item was either not found, or you do not have enough of it to use this amount.");
+                    }
+
                     break;
 
                 case "/search":
-                    System.out.println("Searching for an item...");
+                    System.out.println("Write the name of the grocery:");
+                    input2 = scanner.nextLine();
+
+                    fridge.search(input2);
+                    
                     break;
 
                 case "/overview":
-                    System.out.println("Displaying fridge overview...");
+                    fridge.overview();
                     break;
 
                 case "/expiredOverview":
-                    System.out.println("Displaying expired items...");
+                    fridge.dateOverview();
                     break;
 
                 case "/value":
-                    System.out.println("Checking fridge value...");
+                    fridge.value();
                     break;
 
                 case "/exit":
@@ -43,8 +63,24 @@ public class main {
                     System.exit(0);
                     break;
 
+                case "/createRecipe":
+                    cookBook.createRecipe();
+                    break;
+
+                case "/viewRecipes":
+                    cookBook.viewRecipes();
+                    break;
+
+                case "/recommendedRecipes":
+                    cookBook.recipeAvailability(fridge);
+                    break;
+
+                case "/help":
+                    fridge.help();
+                    break;
+
                 default:
-                    System.out.println("Invalid command. Please try again.");
+                    System.out.println("Invalid command. Please try again. Write \"/help\" to see all available commands.");
             }
         }
 
