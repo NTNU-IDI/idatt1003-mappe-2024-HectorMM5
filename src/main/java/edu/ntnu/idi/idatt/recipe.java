@@ -2,11 +2,13 @@ import java.util.ArrayList;
 
 public class recipe {
     public String name;
-    private ArrayList<grocery> foods = new ArrayList<>();
+    public String description;
+    public ArrayList<grocery> foods;
     private ArrayList<String> instructions;
 
-    public recipe(String name, ArrayList<String> instructions, ArrayList<grocery> foods) {
+    public recipe(String name, String description, ArrayList<String> instructions, ArrayList<grocery> foods) {
         this.name = name;
+        this.description = description;
         this.instructions = instructions;
         this.foods = foods;
     
