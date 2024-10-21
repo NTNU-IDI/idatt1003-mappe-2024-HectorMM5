@@ -3,10 +3,10 @@ public class grocery {
     private String name;
     private String unit;
     private float amount;
-    private int cost;
+    private float cost;
     private int expiryDate;
 
-    public grocery(String name, String unit, float amount, int cost, int expiryDate) {
+    public grocery(String name, String unit, float amount, float cost, int expiryDate) {
         this.name = name;
         this.unit = unit;
         this.amount = amount;
