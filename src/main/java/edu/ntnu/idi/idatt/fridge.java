@@ -38,7 +38,7 @@ public class fridge {
                 System.out.println("Ingrediensen du leter etter finnes ikke.");
             }
         }
-    }
+    } 
 
     public void overview() {
         for (int i = 0; i <= ingredients.size()-1; i++) {
@@ -70,7 +70,7 @@ public class fridge {
         System.out.println("En oversikt over tilgjengelige kommandoer kan ses under:");
         System.out.println("--------------------------------------------------------");
         System.out.println("\n    - \"/nyVare\" for å legge inn en ny vare.");
-        System.out.println("    - \"/brukVare\" for å hente ut en vare.");
+        System.out.println("    - \"/bruk\" for å hente ut en vare.");
         System.out.println("    - \"/sok\" for å søke etter en vare og hente ut tilhørende informasjon.");
         System.out.println("    - \"/oversikt\" for å sjekke alt som finnes i kjøleskapet akkurat nå.");
         System.out.println("    - \"/datoOversikt\" for å sjekke alt som finnes i kjøleskapet, som har gått ut på dato.");
