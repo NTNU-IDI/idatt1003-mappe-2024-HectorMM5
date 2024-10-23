@@ -1,12 +1,15 @@
+package edu.ntnu.idi.idatt;
+
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class cookBook {
+public class CookBook {
     Scanner scanner = new Scanner(System.in);
-    ArrayList<recipe> cookBook = new ArrayList<>(); 
+    ArrayList<Recipe> cookBook = new ArrayList<>();
 
     public void createRecipe() {
-        ArrayList<grocery> food = new ArrayList<>();
+        ArrayList<Grocery> food = new ArrayList<>();
         ArrayList<String> instructions = new ArrayList<>();
         
         System.out.println("Write the name of the dish.");
@@ -32,7 +35,7 @@ public class cookBook {
                 }
 
                 try {
-                    food.add(new grocery(splitInput[0], splitInput[2], Float.parseFloat(splitInput[1])));
+                    food.add(new Grocery(splitInput[0], splitInput[2], Float.parseFloat(splitInput[1])));
                     
                 } 
                 
@@ -56,7 +59,7 @@ public class cookBook {
 
         }
 
-        cookBook.add(new recipe(name, description, instructions, food));
+        cookBook.add(new Recipe(name, description, instructions, food));
         System.out.println("Your recipe has been saved.");
 
     }
@@ -71,9 +74,9 @@ public class cookBook {
 
     }
 
-    public void recipeAvailability(fridge fridge) {
+    public void recipeAvailability(Fridge fridge) {
 
-        ArrayList<recipe> availableRecipes = new ArrayList<>();
+        ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
         for (int i = 0; i < cookBook.size(); i++) {
             int maxIngredients = cookBook.get(i).foods.size();

@@ -1,10 +1,15 @@
+package edu.ntnu.idi.idatt;
+
+import edu.ntnu.idi.idatt.CookBook;
+import edu.ntnu.idi.idatt.Fridge;
+
 import java.util.Scanner;
-public class main {
+public class Main {
 
     public static void main(String[] args) {
-        fridge fridge = new fridge();
+        Fridge fridge = new Fridge();
         Scanner scanner = new Scanner(System.in);
-        cookBook cookBook = new cookBook();
+        CookBook cookBook = new CookBook();
 
         System.out.println("Welcome to the fridge, write /help for all commands.");
 
@@ -83,11 +88,5 @@ public class main {
                     System.out.println("Invalid command. Please try again. Write \"/help\" to see all available commands.");
             }
         }
-
-
-
     }
-
-
-
 }
