@@ -1,12 +1,16 @@
+package edu.ntnu.idi.idatt;
+
+import edu.ntnu.idi.idatt.Grocery;
+
 import java.util.ArrayList;
 
-public class recipe {
+public class Recipe {
     public String name;
     public String description;
-    public ArrayList<grocery> foods;
+    public ArrayList<Grocery> foods;
     private ArrayList<String> instructions;
 
-    public recipe(String name, String description, ArrayList<String> instructions, ArrayList<grocery> foods) {
+    public Recipe(String name, String description, ArrayList<String> instructions, ArrayList<Grocery> foods) {
         this.name = name;
         this.description = description;
         this.instructions = instructions;

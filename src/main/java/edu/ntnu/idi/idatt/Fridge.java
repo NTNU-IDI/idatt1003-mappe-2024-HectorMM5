@@ -1,9 +1,14 @@
+package edu.ntnu.idi.idatt;
+
+
+import edu.ntnu.idi.idatt.Grocery;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class fridge {
+public class Fridge {
 
-    public ArrayList<grocery> ingredients = new ArrayList<>();
+    public ArrayList<Grocery> ingredients = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
     public void newGrocery() {
@@ -48,7 +53,7 @@ public class fridge {
             }
         }
 
-        ingredients.add(new grocery(name, unit, amount, cost, expiryDate));
+        ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
         System.out.println("Your grocery has been put in the fridge.");
     }
 
