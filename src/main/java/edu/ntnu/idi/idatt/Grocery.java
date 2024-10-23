@@ -1,14 +1,17 @@
 package edu.ntnu.idi.idatt;
 
+import java.time.LocalDate;
+
+
 public class Grocery {
 
   private String name;
   private String unit;
   private float amount;
   private float cost;
-  private int expiryDate;
+  private LocalDate expiryDate;
 
-  public Grocery(String name, String unit, float amount, float cost, int expiryDate) {
+  public Grocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
     this.name = name;
     this.unit = unit;
     this.amount = amount;
@@ -20,8 +23,8 @@ public class Grocery {
   /**
    * Grocery Constructor.
    *
-   * @param name name of grocery
-   * @param unit unit of grocery
+   * @param name   name of grocery
+   * @param unit   unit of grocery
    * @param amount amount of grocery
    */
   public Grocery(String name, String unit, float amount) {
@@ -47,7 +50,7 @@ public class Grocery {
     return this.cost;
   }
 
-  public int getExpiryDate() {
+  public LocalDate getExpiryDate() {
     return this.expiryDate;
   }
 
@@ -56,10 +59,12 @@ public class Grocery {
   }
 
   public void use(float amount) {
-    if (this.amount > amount) {
+    if (amount <= 0) {
+      System.out.println("Amount must be greater than zero.");
+    } else if (this.amount >= amount) {
       this.amount -= amount;
     } else {
-      System.out.println("Du har ikke nok " + this.name + " til dette.");
+      System.out.println("You do not have enough " + this.name + " to take out that amount.");
     }
   }
 

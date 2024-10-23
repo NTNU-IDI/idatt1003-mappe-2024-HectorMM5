@@ -1,108 +1,112 @@
 package edu.ntnu.idi.idatt;
 
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CookBook {
-    Scanner scanner = new Scanner(System.in);
-    ArrayList<Recipe> cookBook = new ArrayList<>();
+  Scanner scanner = new Scanner(System.in);
+  ArrayList<Recipe> cookBook = new ArrayList<>();
 
-    public void createRecipe() {
-        ArrayList<Grocery> food = new ArrayList<>();
-        ArrayList<String> instructions = new ArrayList<>();
-        
-        System.out.println("Write the name of the dish.");
-        String input = scanner.nextLine();
-        String name = input;
+  public void createRecipe() {
+    ArrayList<Grocery> food = new ArrayList<>();
+    ArrayList<String> instructions = new ArrayList<>();
 
-        System.out.println("Write a short description of the dish.");
-        input = scanner.nextLine();
-        String description = input;
+    System.out.println("Write the name of the dish.");
+    String input = scanner.nextLine();
+    String name = input;
 
-        System.out.println("Write info about the ingredients in the following format: name, amount, unit.\n Write \"Done\" when done.");
-        
-        while (true) {
-            input = scanner.nextLine();
-            if (input.equalsIgnoreCase("Done")) {break;}
+    System.out.println("Write a short description of the dish.");
+    input = scanner.nextLine();
+    String description = input;
 
-            String[] splitInput = input.split(",");
+    System.out.println(
+        "Write info about the ingredients in the following format: name, amount, unit.\n Write \"Done\" when done.");
 
-            if (splitInput.length == 3) {
+    while (true) {
+      input = scanner.nextLine();
+      if (input.equalsIgnoreCase("Done")) {
+        break;
+      }
 
-                for (int i = 0; i < splitInput.length; i++) {
-                    splitInput[i] = splitInput[i].trim();
-                }
+      String[] splitInput = input.split(",");
 
-                try {
-                    food.add(new Grocery(splitInput[0], splitInput[2], Float.parseFloat(splitInput[1])));
-                    
-                } 
-                
-                catch (IllegalArgumentException e) {
-                    System.out.println("There was an issue with your input, please try again, and verify that it is in the format: name, amount, unit.");
-                }
-            }
+      if (splitInput.length == 3) {
 
-            else {
-                throw new IllegalArgumentException("3 arguments expected, but recieved " + splitInput.length + " instead.");
-
-            }
+        for (int i = 0; i < splitInput.length; i++) {
+          splitInput[i] = splitInput[i].trim();
         }
 
-        System.out.println("Write the instructions. You can use multiple lines if needed, and have them assigned in and numbered list.\n Write \"Done\" when done.");
+        try {
+          food.add(new Grocery(splitInput[0], splitInput[2], Float.parseFloat(splitInput[1])));
 
-        while (true) {
-            input = scanner.nextLine();
-            if (input.equalsIgnoreCase("Done")) {break;}
-            instructions.add(input);
-
+        } catch (IllegalArgumentException e) {
+          System.out.println(
+              "There was an issue with your input, please try again, and verify that it is in the format: name, amount, unit.");
         }
+      } else {
+        throw new IllegalArgumentException(
+            "3 arguments expected, but recieved " + splitInput.length + " instead.");
 
-        cookBook.add(new Recipe(name, description, instructions, food));
-        System.out.println("Your recipe has been saved.");
+      }
+    }
+
+    System.out.println(
+        "Write the instructions. You can use multiple lines if needed, and have them assigned in and numbered list.\n Write \"Done\" when done.");
+
+    while (true) {
+      input = scanner.nextLine();
+      if (input.equalsIgnoreCase("Done")) {
+        break;
+      }
+      instructions.add(input);
 
     }
 
+    cookBook.add(new Recipe(name, description, instructions, food));
+    System.out.println("Your recipe has been saved.");
 
-    public void viewRecipes() {
-        System.out.println("Your saved recipes:");
-        for (int i = 0; i < cookBook.size(); i++) {
-            System.out.println(i + " " + cookBook.get(i).name);
-            
+  }
+
+
+  public void viewRecipes() {
+    System.out.println("Your saved recipes:");
+    for (int i = 0; i < cookBook.size(); i++) {
+      System.out.println(i + " " + cookBook.get(i).name);
+
+    }
+
+  }
+
+  public void recipeAvailability(Fridge fridge) {
+
+    ArrayList<Recipe> availableRecipes = new ArrayList<>();
+
+    for (int i = 0; i < cookBook.size(); i++) {
+      int maxIngredients = cookBook.get(i).foods.size();
+      int ingredientsOk = 0;
+      for (int j = 0; j < cookBook.get(i).foods.size(); j++) {
+        for (int k = 0; k < fridge.ingredients.size(); k++) {
+          if (cookBook.get(i).foods.get(j).getName()
+              .equalsIgnoreCase(fridge.ingredients.get(k).getName())) {
+            if (fridge.ingredients.get(k).getAmount() >= cookBook.get(i).foods.get(j).getAmount()) {
+              ingredientsOk += 1;
+            }
+          }
         }
+      }
+
+      if (maxIngredients == ingredientsOk) {
+        availableRecipes.add(cookBook.get(i));
+      }
 
     }
 
-    public void recipeAvailability(Fridge fridge) {
+    System.out.println("With the ingredients you have, you are able to make:");
 
-        ArrayList<Recipe> availableRecipes = new ArrayList<>();
-
-        for (int i = 0; i < cookBook.size(); i++) {
-            int maxIngredients = cookBook.get(i).foods.size();
-            int ingredientsOK = 0;
-            for (int j = 0; j < cookBook.get(i).foods.size(); j++) {
-                for (int k = 0; k < fridge.ingredients.size(); k++) {
-                    if (cookBook.get(i).foods.get(j).getName().equalsIgnoreCase(fridge.ingredients.get(k).getName())) {
-                        if (fridge.ingredients.get(k).getAmount() >= cookBook.get(i).foods.get(j).getAmount()) {
-                            ingredientsOK += 1;
-                        }
-                    }
-                }
-            }
-
-            if (maxIngredients == ingredientsOK) {
-                availableRecipes.add(cookBook.get(i));
-            }
-
-        }
-
-        System.out.println("With the ingredients you have, you are able to make:");
-
-        for (int i = 0; i < availableRecipes.size(); i++) {
-            System.out.println(i + ". " + availableRecipes.get(i).name);
-            
-        }
+    for (int i = 0; i < availableRecipes.size(); i++) {
+      System.out.println(i + ". " + availableRecipes.get(i).name);
 
     }
+
+  }
 }
