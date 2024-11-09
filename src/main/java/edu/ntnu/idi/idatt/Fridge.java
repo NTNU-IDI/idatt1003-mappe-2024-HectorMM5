@@ -19,53 +19,7 @@ public class Fridge {
    * Guides the user through creating a new grocery item.
    */
 
-  public void newGrocery() {
-
-    System.out.println("Write the name of the grocery.");
-    final String name = scanner.nextLine();
-
-    System.out.println("Write the unit of the grocery.");
-    final String unit = scanner.nextLine();
-
-    System.out.println("Enter the amount (in numeric format):");
-    float amount;
-
-    while (true) {
-      try {
-        amount = Float.parseFloat(scanner.nextLine());
-        break;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter a numeric value for amount:");
-      }
-    }
-
-    System.out.println("Enter the cost (of the total amount):");
-    float cost;
-    while (true) {
-      try {
-        cost = Float.parseFloat(scanner.nextLine());
-        break;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter a numeric value for cost:");
-      }
-    }
-
-    System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
-    LocalDate expiryDate;
-    while (true) {
-      String input = scanner.nextLine();
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-      try {
-        expiryDate = LocalDate.parse(input, formatter);
-        break;
-
-      } catch (DateTimeParseException e) {
-
-        System.out.println(
-            "Invalid input, please enter the date in the correct format (DDMMYYYY):");
-      }
-    }
-
+  public void newGrocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
     ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
     System.out.println("Your grocery has been put in the fridge.");
   }
@@ -140,10 +94,12 @@ public class Fridge {
       value += ingredients.get(i).getCost() * ingredients.get(i).getAmount();
     }
 
-    System.out.println("Verdien av innholdet er " + value + " kroner.");
+    System.out.println("The value of the content is " + value + " euros.");
   }
 
-
+  /**
+   * Prints out an overview of all the commands.
+   */
   public void help() {
     System.out.println("--------------------------------------------------------");
     System.out.println("An overview of available commands can be seen below:");
