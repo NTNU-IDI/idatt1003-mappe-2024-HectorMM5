@@ -3,80 +3,88 @@ package edu.ntnu.idi.idatt;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Class that represents a cookbook.
+ * Saves individual dishes with their respective names, ingredients, descriptions and instructions.
+ */
 public class CookBook {
   Scanner scanner = new Scanner(System.in);
   ArrayList<Recipe> cookBook = new ArrayList<>();
 
-  public void createRecipe() {
-    ArrayList<Grocery> food = new ArrayList<>();
-    ArrayList<String> instructions = new ArrayList<>();
 
+  /**
+   * Guides the user through the creation of a recipe.
+   */
+  public void createRecipe() {
     System.out.println("Write the name of the dish.");
-    String input = scanner.nextLine();
-    String name = input;
+    final String name = scanner.nextLine();
 
     System.out.println("Write a short description of the dish.");
-    input = scanner.nextLine();
-    String description = input;
+    final String description = scanner.nextLine();
 
-    System.out.println(
-        "Write info about the ingredients in the following format: name, amount, unit.\n Write \"Done\" when done.");
+    ArrayList<Grocery> food = new ArrayList<>();
+    System.out.println("Specify the ingredients in the following format: name, amount, unit. "
+        + "\nWrite \"Done\" when done.");
 
+    // Collect ingredients
     while (true) {
-      input = scanner.nextLine();
-      if (input.equalsIgnoreCase("Done")) {
+      String ingredient = scanner.nextLine();
+      if (ingredient.equalsIgnoreCase("Done")) {
         break;
       }
 
-      String[] splitInput = input.split(",");
-
-      if (splitInput.length == 3) {
-
-        for (int i = 0; i < splitInput.length; i++) {
-          splitInput[i] = splitInput[i].trim();
+      String[] splitIngredient = ingredient.split(",");
+      if (splitIngredient.length == 3) {
+        for (int i = 0; i < splitIngredient.length; i++) {
+          splitIngredient[i] = splitIngredient[i].trim();
         }
 
         try {
-          food.add(new Grocery(splitInput[0], splitInput[2], Float.parseFloat(splitInput[1])));
-
+          food.add(new Grocery(splitIngredient[0], splitIngredient[2], Float.parseFloat(splitIngredient[1])));
         } catch (IllegalArgumentException e) {
-          System.out.println(
-              "There was an issue with your input, please try again, and verify that it is in the format: name, amount, unit.");
+          System.out.println("There was an issue with your input. "
+              + "Please verify the format: name, amount, unit.");
         }
       } else {
-        throw new IllegalArgumentException(
-            "3 arguments expected, but recieved " + splitInput.length + " instead.");
-
+        throw new IllegalArgumentException("Expected three arguments, but received "
+            + splitIngredient.length + " instead. Check your input.");
       }
     }
 
-    System.out.println(
-        "Write the instructions. You can use multiple lines if needed, and have them assigned in and numbered list.\n Write \"Done\" when done.");
+    ArrayList<String> instructions = new ArrayList<>();
+    System.out.println("Write the instructions, use multiple lines if needed. "
+        + "\nWrite \"Done\" when done.");
 
+    // Collect instructions
     while (true) {
-      input = scanner.nextLine();
-      if (input.equalsIgnoreCase("Done")) {
+      String instruction = scanner.nextLine();
+      if (instruction.equalsIgnoreCase("Done")) {
         break;
       }
-      instructions.add(input);
-
+      instructions.add(instruction);
     }
 
     cookBook.add(new Recipe(name, description, instructions, food));
     System.out.println("Your recipe has been saved.");
-
   }
 
-
+  /**
+   * Allows the user to view the created recipes.
+   */
   public void viewRecipes() {
     System.out.println("Your saved recipes:");
     for (int i = 0; i < cookBook.size(); i++) {
-      System.out.println(i + " " + cookBook.get(i).name);
+      System.out.println(i + 1 + ". " + cookBook.get(i).name);
 
     }
 
   }
 
+  /**
+   * Shows which recipes are available with the current groceries stored in the fridge.
+   *
+   * @param fridge * Fridge object, necessary to access its contents.
+   */
   public void recipeAvailability(Fridge fridge) {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();

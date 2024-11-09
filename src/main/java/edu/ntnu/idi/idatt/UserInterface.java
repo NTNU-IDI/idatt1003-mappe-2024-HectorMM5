@@ -3,18 +3,31 @@ package edu.ntnu.idi.idatt;
 import java.util.Scanner;
 
 /**
- * Class that represents the main user interface.
+ * Class that handles the main user interface.
  */
 
 public class UserInterface {
 
-  public static void main(String[] args) {
+  /**
+   * Function used to declare key variables.
+   */
+  public void init() {
     Fridge fridge = new Fridge();
     Scanner scanner = new Scanner(System.in);
     CookBook cookBook = new CookBook();
 
     System.out.println("Welcome to the fridge, write /help for all commands.");
+  }
 
+  /**
+   * Function that handles the main user interface functionality.
+   *
+   * @param scanner * Scanner used to take in inputs.
+   * @param fridge * Fridge object used as reference to the current existing groceries.
+   * @param cookBook * Cookbook object used to keep recipes.
+   */
+
+  public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
     String input;
 
     while (true) {
@@ -93,3 +106,5 @@ public class UserInterface {
     }
   }
 }
+
+

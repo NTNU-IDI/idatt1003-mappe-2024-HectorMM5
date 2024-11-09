@@ -78,7 +78,7 @@ public class Grocery {
     if (amount <= 0) {
       throw new IllegalArgumentException("Amount must be greater than zero.");
     } else {
-      this.amount -= amount;
+      this.amount = amount;
     }
   }
 
@@ -95,6 +95,9 @@ public class Grocery {
       throw new IllegalStateException("Not enough " + this.name + " to use the specified amount.");
     } else {
       this.amount -= amount;
+      System.out.println("You take out " + amount + " " + this.getUnit() + " "
+          + this.getName() + ", and have " + this.getAmount() + " "
+          + this.getUnit() + " left.");
     }
   }
 
