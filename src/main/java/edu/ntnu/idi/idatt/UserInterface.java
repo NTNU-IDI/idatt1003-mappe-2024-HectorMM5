@@ -2,7 +2,11 @@ package edu.ntnu.idi.idatt;
 
 import java.util.Scanner;
 
-public class Main {
+/**
+ * Class that represents the main user interface.
+ */
+
+public class UserInterface {
 
   public static void main(String[] args) {
     Fridge fridge = new Fridge();
@@ -41,7 +45,7 @@ public class Main {
 
           } catch (Exception e) {
             System.out.println(
-                "Something went wrong. The item was either not found, or you do not have enough of it to use this amount.");
+                "The item was either not found, or you do not have enough of it to use this amount.");
           }
 
           break;
@@ -84,7 +88,7 @@ public class Main {
 
         default:
           System.out.println(
-              "Invalid command. Write \"/help\" to see all available commands, or type \"/exit\" to terminate the program.");
+              "Invalid command. Write \"/help\" to see all available commands.");
       }
     }
   }
