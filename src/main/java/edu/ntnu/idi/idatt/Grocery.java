@@ -2,14 +2,28 @@ package edu.ntnu.idi.idatt;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a food/grocery. Takes in name, unit and amount, optionally cost and expiryDate.
+ * Second constructor is generally to be used in cookbook, where cost and expiryDate are irrelevant.
+ */
 
 public class Grocery {
 
-  private String name;
-  private String unit;
+  private final String name;
+  private final String unit;
   private float amount;
   private float cost;
   private LocalDate expiryDate;
+
+  /**
+   * Creates a grocery item with these parameters. Generally kept for food storage.
+   *
+   * @param name * Name of grocery item.
+   * @param unit * Unit of grocery item.
+   * @param amount * Amount of grocery item, measured in units.
+   * @param cost * Cost per unit.
+   * @param expiryDate * LocalDate object, represents the expiry date of the grocery.
+   */
 
   public Grocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
     this.name = name;
@@ -21,7 +35,7 @@ public class Grocery {
   }
 
   /**
-   * Grocery Constructor.
+   * Creates a grocery item with these parameters, generally kept for cookbook purposes.
    *
    * @param name   name of grocery
    * @param unit   unit of grocery
@@ -54,17 +68,33 @@ public class Grocery {
     return this.expiryDate;
   }
 
+  /**
+   * Sets a new amount for an existing grocery object.
+   *
+   * @param amount * Amount to be changed to.
+   */
+
   public void setAmount(float amount) {
-    this.amount = amount;
+    if (amount <= 0) {
+      throw new IllegalArgumentException("Amount must be greater than zero.");
+    } else {
+      this.amount -= amount;
+    }
   }
+
+  /**
+   * Uses a given amount of the total amount.
+   *
+   * @param amount * Amount to be consumed.
+   */
 
   public void use(float amount) {
     if (amount <= 0) {
-      System.out.println("Amount must be greater than zero.");
-    } else if (this.amount >= amount) {
-      this.amount -= amount;
+      throw new IllegalArgumentException("Amount must be greater than zero.");
+    } else if (this.amount < amount) {
+      throw new IllegalStateException("Not enough " + this.name + " to use the specified amount.");
     } else {
-      System.out.println("You do not have enough " + this.name + " to take out that amount.");
+      this.amount -= amount;
     }
   }
 
