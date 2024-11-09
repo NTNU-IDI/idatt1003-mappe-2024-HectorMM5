@@ -64,7 +64,20 @@ public class CookBook {
       instructions.add(instruction);
     }
 
-    cookBook.add(new Recipe(name, description, instructions, food));
+    System.out.println("How many portions does this make?");
+
+    int portions;
+
+    while (true) {
+      try {
+        portions = Integer.parseInt(scanner.nextLine().trim());
+        break;
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a whole number.");
+      }
+    }
+
+    cookBook.add(new Recipe(name, description, instructions, food, portions));
     System.out.println("Your recipe has been saved.");
   }
 
