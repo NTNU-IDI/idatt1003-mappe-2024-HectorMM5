@@ -44,16 +44,26 @@ class GroceryTest {
   }
 
   @Test
-  void setAmount() {
-    testGrocery.setAmount(6);
-    assertEquals(6, testGrocery.getAmount());
-
+  void setAmountPositive() {
+    testGrocery.setAmount(10);  // Set a valid amount
+    assertEquals(10, testGrocery.getAmount());
   }
 
   @Test
-  void use() {
+  void setAmountNegative() {
+    assertThrows(IllegalArgumentException.class, () -> testGrocery.setAmount(-5));
+
+    assertThrows(IllegalArgumentException.class, () -> testGrocery.setAmount(0));
+  }
+
+  @Test
+  void usePositive() {
     testGrocery.use(4);
     assertEquals(1, testGrocery.getAmount());
 
+  }
+  @Test
+  void useNegative() {
+    assertThrows(IllegalArgumentException.class, () -> testGrocery.use(-1));
   }
 }

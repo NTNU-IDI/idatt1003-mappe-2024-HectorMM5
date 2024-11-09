@@ -6,18 +6,26 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Fridge represents the food storage, keeping accessible grocery objects.
+ */
+
 public class Fridge {
 
   public ArrayList<Grocery> ingredients = new ArrayList<>();
   Scanner scanner = new Scanner(System.in);
 
+  /**
+   * Guides the user through creating a new grocery item.
+   */
+
   public void newGrocery() {
 
     System.out.println("Write the name of the grocery.");
-    String name = scanner.nextLine();
+    final String name = scanner.nextLine();
 
     System.out.println("Write the unit of the grocery.");
-    String unit = scanner.nextLine();
+    final String unit = scanner.nextLine();
 
     System.out.println("Enter the amount (in numeric format):");
     float amount;
@@ -62,35 +70,44 @@ public class Fridge {
     System.out.println("Your grocery has been put in the fridge.");
   }
 
-  public void use(String argument, float consume) {
+  /**
+   * Finds and takes out a given amount of an item within the fridge.
+   *
+   * @param name * Ingredient's name.
+   * @param consume * Amount to be consumed.
+   */
+
+  public void use(String name, float consume) {
     for (int i = 0; i < ingredients.size(); i++) {
-      if (ingredients.get(i).getName().equals(argument)) {
-        if (ingredients.get(i).getAmount() >= consume) {
-          ingredients.get(i).setAmount(ingredients.get(i).getAmount() - consume);
-          System.out.println("Du tar ut " + consume + " " + ingredients.get(i).getUnit() + " "
-              + ingredients.get(i).getName() + ", og har " + ingredients.get(i).getAmount() + " "
-              + ingredients.get(i).getUnit() + " igjen.");
-        } else {
-          System.out.println("Du har ikke nok " + ingredients.get(i).getName() + " til dette.");
-        }
+      if (ingredients.get(i).getName().equalsIgnoreCase(name)) {
+        ingredients.get(i).use(consume);
 
       } else if (i == ingredients.size() - 1) {
-        System.out.println("Ingrediensen du leter etter finnes ikke.");
+        System.out.println("The ingredient you're looking for does not exist. Check for typos.");
       }
     }
   }
+
+  /**
+   * Allows the user to search for an ingredient within the fridge.
+   *
+   * @param argument * Ingredient's name.
+   */
 
   public void search(String argument) {
     for (int i = 0; i < ingredients.size(); i++) {
       if (ingredients.get(i).getName().equals(argument)) {
-        System.out.println("Ingrediensen " + ingredients.get(i).getName() + " finnes, du har "
+        System.out.println("The ingredient " + ingredients.get(i).getName() + " exists, you have "
             + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + ".");
       } else if (i == ingredients.size() - 1) {
-        System.out.println("Ingrediensen du leter etter finnes ikke.");
+        System.out.println("The ingredient you're looking for does not exist.");
       }
     }
   }
 
+  /**
+   * Writes out an overview of the ingredients in the fridge.
+   */
   public void overview() {
     for (int i = 0; i < ingredients.size(); i++) {
       System.out.println(
@@ -99,8 +116,11 @@ public class Fridge {
     }
   }
 
+  /**
+   * Writes out an overview of the ingredients that have expired.
+   */
   public void dateOverview() {
-    System.out.println("The following items have expired");
+    System.out.println("The following items have expired:");
     for (int i = 0; i < ingredients.size(); i++) {
       if (ingredients.get(i).getExpiryDate().isBefore(LocalDate.now())) {
         System.out.println(
@@ -110,6 +130,9 @@ public class Fridge {
     }
   }
 
+  /**
+   * Prints out the value of all the ingredients in the fridge.
+   */
   public void value() {
 
     float value = 0f;
