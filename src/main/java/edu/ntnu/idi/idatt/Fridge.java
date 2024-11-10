@@ -1,10 +1,11 @@
 package edu.ntnu.idi.idatt;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
+
+
 
 /**
  * Fridge represents the food storage, keeping accessible grocery objects.
@@ -35,6 +36,10 @@ public class Fridge {
     for (int i = 0; i < ingredients.size(); i++) {
       if (ingredients.get(i).getName().equalsIgnoreCase(name)) {
         ingredients.get(i).use(consume);
+        if (ingredients.get(i).getAmount() == 0) {
+          ingredients.remove(i);
+          i -= 1;
+        }
 
       } else if (i == ingredients.size() - 1) {
         System.out.println("The ingredient you're looking for does not exist. Check for typos.");
@@ -48,21 +53,20 @@ public class Fridge {
    * @param argument * Ingredient's name.
    */
 
-  public void search(String argument) {
+  public Grocery search(String argument) {
     for (int i = 0; i < ingredients.size(); i++) {
-      if (ingredients.get(i).getName().equals(argument)) {
-        System.out.println("The ingredient " + ingredients.get(i).getName() + " exists, you have "
-            + ingredients.get(i).getAmount() + " " + ingredients.get(i).getUnit() + ".");
-      } else if (i == ingredients.size() - 1) {
-        System.out.println("The ingredient you're looking for does not exist.");
+      if (ingredients.get(i).getName().equalsIgnoreCase(argument)) {
+        return ingredients.get(i);
       }
     }
+    return null;
   }
 
   /**
-   * Writes out an overview of the ingredients in the fridge.
+   * Prints a sorted overview of the ingredients.
    */
   public void overview() {
+    ingredients.sort(Comparator.comparing(Grocery::getName));
     for (int i = 0; i < ingredients.size(); i++) {
       System.out.println(
           ingredients.get(i).getName() + ": " + ingredients.get(i).getAmount() + " "

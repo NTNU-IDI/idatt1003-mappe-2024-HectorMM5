@@ -105,9 +105,15 @@ public class UserInterface {
 
         case "/search":
           System.out.println("Write the name of the grocery:");
-          input2 = scanner.nextLine();
 
-          fridge.search(input2);
+          Grocery result = fridge.search(scanner.nextLine());
+
+          if (result != null) {
+            System.out.println("The ingredient " + result.getName() + " exists, you have "
+                + result.getAmount() + " " + result.getUnit() + ".");
+          } else {
+            System.out.println("The ingredient you're looking for does not exist.");
+          }
 
           break;
 
