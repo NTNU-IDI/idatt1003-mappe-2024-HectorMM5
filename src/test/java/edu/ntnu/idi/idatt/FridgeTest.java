@@ -103,7 +103,9 @@ public class FridgeTest {
     fridge.ingredients.add(new Grocery("Milk", "L", 1, 5, LocalDate.of(2025, 12, 1))); // Not expired
     fridge.dateOverview();
 
-    assertEquals("The following items have expired:", outContent.toString().trim());
+    assertTrue(outContent.toString().contains("The following items have expired:"));
+    assertTrue(outContent.toString().contains("You have a total of 0 euros worth of expired food."));
+
   }
 
   @Test

@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -130,7 +131,68 @@ public class UserInterface {
           break;
 
         case "/createRecipe":
-          cookBook.createRecipe();
+          System.out.println("Now creating a new recipe.");
+          System.out.println("Write the name of the dish:");
+          final String dishName = scanner.nextLine();
+
+          System.out.println("Write a short description of the dish.");
+          final String description = scanner.nextLine();
+
+          ArrayList<Grocery> food = new ArrayList<>();
+          System.out.println("Specify the ingredients in the following format: name, amount, unit. "
+              + "\nWrite \"Done\" when done.");
+
+          while (true) {
+            String ingredient = scanner.nextLine();
+            if (ingredient.equalsIgnoreCase("Done")) {
+              break;
+            }
+
+            String[] splitIngredient = ingredient.split(",");
+            if (splitIngredient.length == 3) {
+              for (int i = 0; i < splitIngredient.length; i++) {
+                splitIngredient[i] = splitIngredient[i].trim();
+              }
+
+              try {
+                food.add(new Grocery(splitIngredient[0], splitIngredient[2], Float.parseFloat(splitIngredient[1])));
+              } catch (IllegalArgumentException e) {
+                System.out.println("There was an issue with your input. "
+                    + "Please verify the format: name, amount, unit.");
+              }
+            } else {
+              throw new IllegalArgumentException("Expected three arguments, but received "
+                  + splitIngredient.length + " instead. Check your input.");
+            }
+          }
+
+          ArrayList<String> instructions = new ArrayList<>();
+          System.out.println("Write the instructions, use multiple lines if needed. "
+              + "\nWrite \"Done\" when done.");
+
+          while (true) {
+            String instruction = scanner.nextLine();
+            if (instruction.equalsIgnoreCase("Done")) {
+              break;
+            }
+            instructions.add(instruction);
+          }
+
+          System.out.println("How many portions does this make?");
+
+          int portions;
+
+          while (true) {
+            try {
+              portions = Integer.parseInt(scanner.nextLine().trim());
+              break;
+            } catch (NumberFormatException e) {
+              System.out.println("Invalid input. Please enter a whole number.");
+            }
+          }
+
+          cookBook.createRecipe(dishName, description, instructions, food, portions);
+          System.out.println("Your recipe has been saved.");
           break;
 
         case "/viewRecipes":

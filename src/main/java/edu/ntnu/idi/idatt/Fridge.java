@@ -54,9 +54,9 @@ public class Fridge {
    */
 
   public Grocery search(String argument) {
-    for (int i = 0; i < ingredients.size(); i++) {
-      if (ingredients.get(i).getName().equalsIgnoreCase(argument)) {
-        return ingredients.get(i);
+    for (Grocery ingredient : ingredients) {
+      if (ingredient.getName().equalsIgnoreCase(argument)) {
+        return ingredient;
       }
     }
     return null;
@@ -67,10 +67,10 @@ public class Fridge {
    */
   public void overview() {
     ingredients.sort(Comparator.comparing(Grocery::getName));
-    for (int i = 0; i < ingredients.size(); i++) {
+    for (Grocery ingredient : ingredients) {
       System.out.println(
-          ingredients.get(i).getName() + ": " + ingredients.get(i).getAmount() + " "
-              + ingredients.get(i).getUnit() + ".");
+          ingredient.getName() + ": " + ingredient.getAmount() + " "
+              + ingredient.getUnit() + ".");
     }
   }
 
@@ -78,14 +78,23 @@ public class Fridge {
    * Writes out an overview of the ingredients that have expired.
    */
   public void dateOverview() {
+    dateOverview(LocalDate.now());
+  }
+
+  public void dateOverview(LocalDate date) {
+    float sum = 0;
     System.out.println("The following items have expired:");
-    for (int i = 0; i < ingredients.size(); i++) {
-      if (ingredients.get(i).getExpiryDate().isBefore(LocalDate.now())) {
+    for (Grocery ingredient : ingredients) {
+      if (ingredient.getExpiryDate().isBefore(LocalDate.now())) {
         System.out.println(
-            ingredients.get(i).getName() + ": " + ingredients.get(i).getAmount() + " "
-                + ingredients.get(i).getUnit() + ".");
+            ingredient.getName() + ": " + ingredient.getAmount() + " "
+                + ingredient.getUnit() + ".");
+
+        sum += ingredient.getCost() * ingredient.getAmount();
       }
     }
+
+    System.out.println("You have a total of " + Math.round(sum) + " euros worth of expired food.");
   }
 
   /**
@@ -94,8 +103,8 @@ public class Fridge {
   public void value() {
 
     float value = 0f;
-    for (int i = 0; i < ingredients.size(); i++) {
-      value += ingredients.get(i).getCost() * ingredients.get(i).getAmount();
+    for (Grocery ingredient : ingredients) {
+      value += ingredient.getCost() * ingredient.getAmount();
     }
 
     System.out.println("The value of the content is " + value + " euros.");
