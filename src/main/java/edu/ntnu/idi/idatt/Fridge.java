@@ -78,10 +78,6 @@ public class Fridge {
    * Writes out an overview of the ingredients that have expired.
    */
   public void dateOverview() {
-    dateOverview(LocalDate.now());
-  }
-
-  public void dateOverview(LocalDate date) {
     float sum = 0;
     System.out.println("The following items have expired:");
     for (Grocery ingredient : ingredients) {
@@ -95,6 +91,17 @@ public class Fridge {
     }
 
     System.out.println("You have a total of " + Math.round(sum) + " euros worth of expired food.");
+  }
+
+  public void expiresBefore(LocalDate date) {
+    System.out.println("The following items will expire before the given date:");
+    for (Grocery ingredient : ingredients) {
+      if (ingredient.getExpiryDate().isBefore(date)) {
+        System.out.println(
+            ingredient.getName() + ": " + ingredient.getAmount() + " "
+                + ingredient.getUnit() + ".");
+      }
+    }
   }
 
   /**
