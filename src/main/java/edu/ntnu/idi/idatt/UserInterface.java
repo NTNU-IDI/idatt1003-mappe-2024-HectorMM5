@@ -126,17 +126,52 @@ public class UserInterface {
           fridge.dateOverview();
           break;
 
+
+        case "/expiresBefore":
+          System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
+          while (true) {
+            String date = scanner.nextLine();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+            try {
+              expiryDate = LocalDate.parse(date, formatter);
+              break;
+
+            } catch (DateTimeParseException e) {
+              System.out.println(
+                  "Invalid input, please enter the date in the correct format (DDMMYYYY):");
+            }
+          }
+
+          fridge.expiresBefore(expiryDate);
+
+
+
         case "/value":
           fridge.value();
           break;
 
         case "/createRecipe":
           System.out.println("Now creating a new recipe.");
-          System.out.println("Write the name of the dish:");
-          final String dishName = scanner.nextLine();
 
-          System.out.println("Write a short description of the dish.");
-          final String description = scanner.nextLine();
+          String dishName;
+          while (true) {
+            System.out.println("Write the name of the dish:");
+            dishName = scanner.nextLine().trim();
+            if (!dishName.isEmpty()) {
+              break;
+            }
+            System.out.println("Dish name cannot be empty. Please enter a valid name.");
+          }
+
+          String description;
+          while (true) {
+            System.out.println("Write a short description of the dish.");
+            description = scanner.nextLine().trim();
+            if (!description.isEmpty()) {
+              break;
+            }
+            System.out.println("Description cannot be empty. Please enter a valid description.");
+          }
 
           ArrayList<Grocery> food = new ArrayList<>();
           System.out.println("Specify the ingredients in the following format: name, amount, unit. "
@@ -150,19 +185,32 @@ public class UserInterface {
 
             String[] splitIngredient = ingredient.split(",");
             if (splitIngredient.length == 3) {
+              boolean valid = true;
               for (int i = 0; i < splitIngredient.length; i++) {
                 splitIngredient[i] = splitIngredient[i].trim();
+                if (splitIngredient[i].isEmpty()) {
+                  valid = false;
+                  break;
+                }
               }
-
-              try {
-                food.add(new Grocery(splitIngredient[0], splitIngredient[2], Float.parseFloat(splitIngredient[1])));
-              } catch (IllegalArgumentException e) {
-                System.out.println("There was an issue with your input. "
-                    + "Please verify the format: name, amount, unit.");
+              if (valid) {
+                try {
+                  amount = Float.parseFloat(splitIngredient[1]);
+                  if (amount > 0) {
+                    food.add(new Grocery(splitIngredient[0], splitIngredient[2], amount));
+                  } else {
+                    System.out.println("Amount must be a positive number. Please try again.");
+                  }
+                } catch (NumberFormatException e) {
+                  System.out.println("Amount must be a valid number. Please try again.");
+                }
+              } else {
+                System.out.println(
+                    "All fields (name, amount, unit) must be non-empty. Please try again.");
               }
             } else {
-              throw new IllegalArgumentException("Expected three arguments, but received "
-                  + splitIngredient.length + " instead. Check your input.");
+              System.out.println(
+                  "Expected three arguments (name, amount, unit). Please check your input.");
             }
           }
 
@@ -178,21 +226,31 @@ public class UserInterface {
             instructions.add(instruction);
           }
 
-          System.out.println("How many portions does this make?");
+          if (instructions.isEmpty()) {
+            System.out.println("At least one instruction is required. Please enter instructions.");
+          }
 
           int portions;
-
+          System.out.println("How many portions does this make?");
           while (true) {
             try {
               portions = Integer.parseInt(scanner.nextLine().trim());
-              break;
+              if (portions > 0) {
+                break;
+              }
+              System.out.println("Portions must be a positive integer. Please try again.");
             } catch (NumberFormatException e) {
               System.out.println("Invalid input. Please enter a whole number.");
             }
           }
 
-          cookBook.createRecipe(dishName, description, instructions, food, portions);
-          System.out.println("Your recipe has been saved.");
+          try {
+            cookBook.createRecipe(dishName, description, instructions, food, portions);
+            System.out.println("Your recipe has been saved.");
+          } catch (Exception e) {
+            System.out.println("An error occurred while saving your recipe. Please try again.");
+          }
+
           break;
 
         case "/viewRecipes":

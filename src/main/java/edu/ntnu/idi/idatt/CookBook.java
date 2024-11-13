@@ -41,14 +41,14 @@ public class CookBook {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
-    for (int i = 0; i < cookBook.size(); i++) {
-      int maxIngredients = cookBook.get(i).foods.size();
+    for (Recipe recipe : cookBook) {
+      int maxIngredients = recipe.foods.size();
       int ingredientsOk = 0;
-      for (int j = 0; j < cookBook.get(i).foods.size(); j++) {
+      for (int j = 0; j < recipe.foods.size(); j++) {
         for (int k = 0; k < fridge.ingredients.size(); k++) {
-          if (cookBook.get(i).foods.get(j).getName()
+          if (recipe.foods.get(j).getName()
               .equalsIgnoreCase(fridge.ingredients.get(k).getName())) {
-            if (fridge.ingredients.get(k).getAmount() >= cookBook.get(i).foods.get(j).getAmount()) {
+            if (fridge.ingredients.get(k).getAmount() >= recipe.foods.get(j).getAmount()) {
               ingredientsOk += 1;
             }
           }
@@ -56,7 +56,7 @@ public class CookBook {
       }
 
       if (maxIngredients == ingredientsOk) {
-        availableRecipes.add(cookBook.get(i));
+        availableRecipes.add(recipe);
       }
 
     }
@@ -68,5 +68,32 @@ public class CookBook {
 
     }
 
+  }
+
+  /**
+   * Checks if a given recipe can be made with the current items in the fridge.
+   *
+   * @param recipe * The recipe in question.
+   * @param fridge * Fridge object to access groceries.
+   */
+
+  public void recipeCheck(Recipe recipe, Fridge fridge) {
+    int maxIngredients = recipe.foods.size();
+    int ingredientsOk = 0;
+    for (Grocery ingredient : recipe.foods) {
+      for (Grocery food : fridge.ingredients) {
+        if (ingredient.getName()
+            .equalsIgnoreCase(food.getName())) {
+          if (food.getAmount() >= ingredient.getAmount()) {
+            ingredientsOk += 1;
+
+          }
+        }
+      }
+    }
+
+    if (maxIngredients == ingredientsOk) {
+      System.out.println("You have enough ingredients to make this dish.");
+    }
   }
 }
