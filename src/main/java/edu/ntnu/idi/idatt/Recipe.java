@@ -37,11 +37,14 @@ public class Recipe {
    */
 
   public void writeRecipe() {
+    //Prints out a small presentation
     System.out.println("Recipe " + this.name + "\n" + this.description + "\n\nYou need:");
-    for (int i = 0; i < this.foods.size(); i++) {
+
+    //For each specified ingredient, print out the name, amount and unit in a string.
+    for (Grocery food : this.foods) {
       System.out.println(
-          "    - " + this.foods.get(i).getAmount() + " " + this.foods.get(i).getUnit() + " "
-              + this.foods.get(i).getName());
+          "    - " + food.getAmount() + " " + food.getUnit() + " "
+              + food.getName());
     }
     System.out.println("\nInstructions:");
     for (int i = 0; i < this.instructions.size(); i++) {
