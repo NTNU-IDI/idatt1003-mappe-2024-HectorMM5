@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import jdk.internal.net.http.frame.FramesDecoder;
 
 /**
  * Class that handles the main user interface.
@@ -12,9 +13,62 @@ import java.util.Scanner;
 
 public class UserInterface {
 
+
+  public void newGroceryInput(Scanner scanner, Fridge fridge) {
+    System.out.println("Write the name of the grocery.");
+    final String name = scanner.nextLine();
+
+    System.out.println("Write the unit of the grocery.");
+    final String unit = scanner.nextLine();
+
+    System.out.println("Enter the amount (in numeric format):");
+    float amount;
+
+    while (true) {
+      try {
+        amount = Float.parseFloat(scanner.nextLine());
+        break;
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input, please enter a numeric value for amount:");
+      }
+    }
+
+    System.out.println("Enter the cost (of the total amount):");
+    float cost;
+    while (true) {
+      try {
+        cost = Float.parseFloat(scanner.nextLine());
+        break;
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input, please enter a numeric value for cost:");
+      }
+    }
+
+    System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
+
+    LocalDate expiryDate = null;
+    while (true) {
+      String date = scanner.nextLine();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+      try {
+        expiryDate = LocalDate.parse(date, formatter);
+        break;
+
+      } catch (DateTimeParseException e) {
+
+        System.out.println(
+            "Invalid input, please enter the date in the correct format (DDMMYYYY):");
+      }
+    }
+
+    fridge.newGrocery(name, unit, amount, cost, expiryDate);
+
+  }
+
   /**
    * Function used to declare key variables.
    */
+
   public void init() {
     Fridge fridge = new Fridge();
     Scanner scanner = new Scanner(System.in);
@@ -36,56 +90,10 @@ public class UserInterface {
 
     while (true) {
       input = scanner.nextLine();
-      String input2;
 
       switch (input) {
         case "/newItem":
-          System.out.println("Write the name of the grocery.");
-          final String name = scanner.nextLine();
 
-          System.out.println("Write the unit of the grocery.");
-          final String unit = scanner.nextLine();
-
-          System.out.println("Enter the amount (in numeric format):");
-          float amount;
-
-          while (true) {
-            try {
-              amount = Float.parseFloat(scanner.nextLine());
-              break;
-            } catch (NumberFormatException e) {
-              System.out.println("Invalid input, please enter a numeric value for amount:");
-            }
-          }
-
-          System.out.println("Enter the cost (of the total amount):");
-          float cost;
-          while (true) {
-            try {
-              cost = Float.parseFloat(scanner.nextLine());
-              break;
-            } catch (NumberFormatException e) {
-              System.out.println("Invalid input, please enter a numeric value for cost:");
-            }
-          }
-
-          System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
-          LocalDate expiryDate;
-          while (true) {
-            String date = scanner.nextLine();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-            try {
-              expiryDate = LocalDate.parse(date, formatter);
-              break;
-
-            } catch (DateTimeParseException e) {
-
-              System.out.println(
-                  "Invalid input, please enter the date in the correct format (DDMMYYYY):");
-            }
-          }
-
-          fridge.newGrocery(name, unit, amount, cost, expiryDate);
           break;
 
         case "/use":
@@ -100,7 +108,7 @@ public class UserInterface {
 
           } catch (Exception e) {
             System.out.println(
-                "The item was either not found, or you do not have enough of it to use this amount.");
+                "The item was either not found, or you do not have enough of it.");
           }
           break;
 
@@ -141,10 +149,8 @@ public class UserInterface {
                   "Invalid input, please enter the date in the correct format (DDMMYYYY):");
             }
           }
-
           fridge.expiresBefore(expiryDate);
-
-
+          break;
 
         case "/value":
           fridge.value();

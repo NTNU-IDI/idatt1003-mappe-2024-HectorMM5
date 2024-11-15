@@ -8,7 +8,6 @@ import java.util.Scanner;
  * Saves individual dishes with their respective names, ingredients, descriptions and instructions.
  */
 public class CookBook {
-  Scanner scanner = new Scanner(System.in);
   ArrayList<Recipe> cookBook = new ArrayList<>();
 
   /**
@@ -44,11 +43,11 @@ public class CookBook {
     for (Recipe recipe : cookBook) {
       int maxIngredients = recipe.foods.size();
       int ingredientsOk = 0;
-      for (int j = 0; j < recipe.foods.size(); j++) {
-        for (int k = 0; k < fridge.ingredients.size(); k++) {
-          if (recipe.foods.get(j).getName()
-              .equalsIgnoreCase(fridge.ingredients.get(k).getName())) {
-            if (fridge.ingredients.get(k).getAmount() >= recipe.foods.get(j).getAmount()) {
+      for (Grocery food : recipe.foods) {
+        for (Grocery ingredient : fridge.ingredients) {
+          if (food.getName()
+              .equalsIgnoreCase(ingredient.getName())) {
+            if (ingredient.getAmount() >= food.getAmount()) {
               ingredientsOk += 1;
             }
           }
