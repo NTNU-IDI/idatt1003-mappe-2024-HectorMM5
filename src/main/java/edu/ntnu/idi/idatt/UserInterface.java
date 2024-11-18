@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import jdk.internal.net.http.frame.FramesDecoder;
 
 /**
  * Class that handles the main user interface.
@@ -13,8 +12,68 @@ import jdk.internal.net.http.frame.FramesDecoder;
 
 public class UserInterface {
 
+  /**
+   * Handles the users actions in an infinite loop, until the program is terminated.
+   *
+   *
+   * @param scanner * Scanner object to take in user input.
+   * @param fridge * Fridge object as food storage reference.
+   * @param cookBook * Cookbook object with a set of saved recipes.
+   */
+  public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
+    String input;
 
-  public void newGroceryInput(Scanner scanner, Fridge fridge) {
+    while (true) {
+      input = scanner.nextLine();
+
+      switch (input) {
+        case "/newItem":
+          handleNewItem(scanner, fridge);
+          break;
+
+        case "/use":
+          handleUse(scanner, fridge);
+          break;
+
+        case "/search":
+          handleSearch(scanner, fridge);
+          break;
+
+        case "/overview":
+          handleOverview(fridge);
+          break;
+
+        case "/expiredOverview":
+          handleExpiredOverview(fridge);
+          break;
+
+        case "/expiresBefore":
+          handleExpiresBefore(scanner, fridge);
+          break;
+
+        case "/value":
+          handleValue(fridge);
+          break;
+
+        case "/createRecipe":
+          handleCreateRecipe(scanner, cookBook);
+          break;
+
+        case "/availableRecipes":
+          handleAvailableRecipes(fridge, cookBook);
+          break;
+
+        case "/checkRecipe":
+          handleCheckRecipe(scanner, cookBook, fridge);
+          break;
+
+        default:
+          System.out.println("Invalid command. Write \"/help\" to see all available commands.");
+      }
+    }
+  }
+
+  private void handleNewItem(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery.");
     final String name = scanner.nextLine();
 
@@ -23,7 +82,6 @@ public class UserInterface {
 
     System.out.println("Enter the amount (in numeric format):");
     float amount;
-
     while (true) {
       try {
         amount = Float.parseFloat(scanner.nextLine());
@@ -45,238 +103,182 @@ public class UserInterface {
     }
 
     System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
-
-    LocalDate expiryDate = null;
+    LocalDate expiryDate;
     while (true) {
-      String date = scanner.nextLine();
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
       try {
-        expiryDate = LocalDate.parse(date, formatter);
+        expiryDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("ddMMyyyy"));
         break;
-
       } catch (DateTimeParseException e) {
+        System.out.println("Invalid input, please enter the date in the format DDMMYYYY:");
 
-        System.out.println(
-            "Invalid input, please enter the date in the correct format (DDMMYYYY):");
       }
     }
 
     fridge.newGrocery(name, unit, amount, cost, expiryDate);
-
   }
 
-  /**
-   * Function used to declare key variables.
-   */
+  private void handleUse(Scanner scanner, Fridge fridge) {
+    System.out.println("Write the name of the grocery you want to use:");
+    String groceryName = scanner.nextLine();
 
-  public void init() {
-    Fridge fridge = new Fridge();
-    Scanner scanner = new Scanner(System.in);
-    CookBook cookBook = new CookBook();
-
-    System.out.println("Welcome to the fridge, write /help for all commands.");
-  }
-
-  /**
-   * Function that handles the main user interface functionality.
-   *
-   * @param scanner * Scanner used to take in inputs.
-   * @param fridge * Fridge object used as reference to the current existing groceries.
-   * @param cookBook * Cookbook object used to keep recipes.
-   */
-
-  public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
-    String input;
-
+    System.out.println("Write the amount you want to use:");
+    float consume;
     while (true) {
-      input = scanner.nextLine();
-
-      switch (input) {
-        case "/newItem":
-
-          break;
-
-        case "/use":
-          System.out.println("Write the name of the grocery you want to use:");
-          String groceryName = scanner.nextLine();
-
-          System.out.println("Write the amount you want to use:");
-          float consume = Float.parseFloat(scanner.nextLine());
-
-          try {
-            fridge.use(groceryName, consume);
-
-          } catch (Exception e) {
-            System.out.println(
-                "The item was either not found, or you do not have enough of it.");
-          }
-          break;
-
-        case "/search":
-          System.out.println("Write the name of the grocery:");
-
-          Grocery result = fridge.search(scanner.nextLine());
-
-          if (result != null) {
-            System.out.println("The ingredient " + result.getName() + " exists, you have "
-                + result.getAmount() + " " + result.getUnit() + ".");
-          } else {
-            System.out.println("The ingredient you're looking for does not exist.");
-          }
-
-          break;
-
-        case "/overview":
-          fridge.overview();
-          break;
-
-        case "/expiredOverview":
-          fridge.dateOverview();
-          break;
-
-
-        case "/expiresBefore":
-          System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
-          while (true) {
-            String date = scanner.nextLine();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-            try {
-              expiryDate = LocalDate.parse(date, formatter);
-              break;
-
-            } catch (DateTimeParseException e) {
-              System.out.println(
-                  "Invalid input, please enter the date in the correct format (DDMMYYYY):");
-            }
-          }
-          fridge.expiresBefore(expiryDate);
-          break;
-
-        case "/value":
-          fridge.value();
-          break;
-
-        case "/createRecipe":
-          System.out.println("Now creating a new recipe.");
-
-          String dishName;
-          while (true) {
-            System.out.println("Write the name of the dish:");
-            dishName = scanner.nextLine().trim();
-            if (!dishName.isEmpty()) {
-              break;
-            }
-            System.out.println("Dish name cannot be empty. Please enter a valid name.");
-          }
-
-          String description;
-          while (true) {
-            System.out.println("Write a short description of the dish.");
-            description = scanner.nextLine().trim();
-            if (!description.isEmpty()) {
-              break;
-            }
-            System.out.println("Description cannot be empty. Please enter a valid description.");
-          }
-
-          ArrayList<Grocery> food = new ArrayList<>();
-          System.out.println("Specify the ingredients in the following format: name, amount, unit. "
-              + "\nWrite \"Done\" when done.");
-
-          while (true) {
-            String ingredient = scanner.nextLine();
-            if (ingredient.equalsIgnoreCase("Done")) {
-              break;
-            }
-
-            String[] splitIngredient = ingredient.split(",");
-            if (splitIngredient.length == 3) {
-              boolean valid = true;
-              for (int i = 0; i < splitIngredient.length; i++) {
-                splitIngredient[i] = splitIngredient[i].trim();
-                if (splitIngredient[i].isEmpty()) {
-                  valid = false;
-                  break;
-                }
-              }
-              if (valid) {
-                try {
-                  amount = Float.parseFloat(splitIngredient[1]);
-                  if (amount > 0) {
-                    food.add(new Grocery(splitIngredient[0], splitIngredient[2], amount));
-                  } else {
-                    System.out.println("Amount must be a positive number. Please try again.");
-                  }
-                } catch (NumberFormatException e) {
-                  System.out.println("Amount must be a valid number. Please try again.");
-                }
-              } else {
-                System.out.println(
-                    "All fields (name, amount, unit) must be non-empty. Please try again.");
-              }
-            } else {
-              System.out.println(
-                  "Expected three arguments (name, amount, unit). Please check your input.");
-            }
-          }
-
-          ArrayList<String> instructions = new ArrayList<>();
-          System.out.println("Write the instructions, use multiple lines if needed. "
-              + "\nWrite \"Done\" when done.");
-
-          while (true) {
-            String instruction = scanner.nextLine();
-            if (instruction.equalsIgnoreCase("Done")) {
-              break;
-            }
-            instructions.add(instruction);
-          }
-
-          if (instructions.isEmpty()) {
-            System.out.println("At least one instruction is required. Please enter instructions.");
-          }
-
-          int portions;
-          System.out.println("How many portions does this make?");
-          while (true) {
-            try {
-              portions = Integer.parseInt(scanner.nextLine().trim());
-              if (portions > 0) {
-                break;
-              }
-              System.out.println("Portions must be a positive integer. Please try again.");
-            } catch (NumberFormatException e) {
-              System.out.println("Invalid input. Please enter a whole number.");
-            }
-          }
-
-          try {
-            cookBook.createRecipe(dishName, description, instructions, food, portions);
-            System.out.println("Your recipe has been saved.");
-          } catch (Exception e) {
-            System.out.println("An error occurred while saving your recipe. Please try again.");
-          }
-
-          break;
-
-        case "/viewRecipes":
-          cookBook.viewRecipes();
-          break;
-
-        case "/recommendedRecipes":
-          cookBook.recipeAvailability(fridge);
-          break;
-
-        case "/help":
-          fridge.help();
-          break;
-
-        default:
-          System.out.println(
-              "Invalid command. Write \"/help\" to see all available commands.");
+      try {
+        consume = Float.parseFloat(scanner.nextLine());
+        break;
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input, please enter a numeric value.");
       }
     }
+
+    try {
+      fridge.use(groceryName, consume);
+    } catch (Exception e) {
+      System.out.println("The item was either not found, or you do not have enough of it.");
+    }
   }
+
+  private void handleSearch(Scanner scanner, Fridge fridge) {
+    System.out.println("Write the name of the grocery:");
+    String groceryName = scanner.nextLine();
+
+    Grocery result = fridge.search(groceryName);
+    if (result != null) {
+      System.out.println("The ingredient " + result.getName() + " exists, you have "
+          + result.getAmount() + " " + result.getUnit() + ".");
+    } else {
+      System.out.println("The ingredient you're looking for does not exist.");
+    }
+  }
+
+  private void handleOverview(Fridge fridge) {
+    fridge.overview();
+  }
+
+  private void handleExpiredOverview(Fridge fridge) {
+    fridge.dateOverview();
+  }
+
+  private void handleExpiresBefore(Scanner scanner, Fridge fridge) {
+    System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
+    LocalDate expiryDate;
+    while (true) {
+      try {
+        expiryDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("ddMMyyyy"));
+        break;
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid input, please enter the date in the format DDMMYYYY:");
+      }
+    }
+    fridge.expiresBefore(expiryDate);
+  }
+
+  private void handleValue(Fridge fridge) {
+    fridge.value();
+  }
+
+  private void handleCreateRecipe(Scanner scanner, CookBook cookBook) {
+    System.out.println("Now creating a new recipe.");
+
+    System.out.println("Write the name of the dish:");
+    final String dishName = scanner.nextLine().trim();
+
+    System.out.println("Write a short description of the dish:");
+    final String description = scanner.nextLine().trim();
+
+    ArrayList<Grocery> ingredients = new ArrayList<>();
+    System.out.println("Specify the ingredients in the format: name, amount, unit.");
+    System.out.println("Write \"Done\" when finished.");
+
+    while (true) {
+      String line = scanner.nextLine();
+      if (line.equalsIgnoreCase("Done")) {
+        break;
+      }
+
+      String[] parts = line.split(",");
+      if (parts.length == 3) {
+        try {
+          float amount = Float.parseFloat(parts[1].trim());
+          if (amount > 0) {
+            ingredients.add(new Grocery(parts[0].trim(), parts[2].trim(), amount));
+          } else {
+            System.out.println("Amount must be positive. Try again.");
+          }
+        } catch (NumberFormatException e) {
+          System.out.println("Invalid amount. Use numeric values.");
+        }
+      } else {
+        System.out.println("Invalid format. Use: name, amount, unit.");
+      }
+    }
+
+    ArrayList<String> instructions = new ArrayList<>();
+    System.out.println("Write the instructions, one line at a time.");
+    System.out.println("Write \"Done\" when finished.");
+
+    while (true) {
+      String line = scanner.nextLine();
+      if (line.equalsIgnoreCase("Done")) {
+        break;
+      }
+      instructions.add(line);
+    }
+
+    System.out.println("How many portions does this make?");
+    int portions = 0;
+    while (true) {
+      try {
+        portions = Integer.parseInt(scanner.nextLine());
+        if (portions > 0) {
+          break;
+        }
+        System.out.println("Portions must be positive. Try again.");
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Use numeric values.");
+      }
+    }
+
+    cookBook.createRecipe(dishName, description, instructions, ingredients, portions);
+    System.out.println("Recipe saved successfully.");
+  }
+
+
+  void handleAvailableRecipes(Fridge fridge, CookBook cookBook) {
+    System.out.println("With the ingredients you have, you are able to make:");
+    for (Recipe recipe : cookBook.recipeAvailability(fridge)) {
+      System.out.println("  - " + recipe.getName());
+    }
+  }
+
+  void handleCheckRecipe(Scanner scanner, CookBook cookBook, Fridge fridge) {
+    System.out.println("What recipe do you want to check?");
+    String choice = scanner.nextLine().trim();
+
+    Recipe chosenRecipe = null;
+    for (Recipe recipe : cookBook.recipeList) {
+      if (recipe.getName().equalsIgnoreCase(choice)) {
+        chosenRecipe = recipe;
+      }
+    }
+
+    if (chosenRecipe != null) {
+      Boolean found = cookBook.recipeCheck(chosenRecipe, fridge);
+
+      if (found) {
+        System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
+      } else {
+        System.out.println("Recipe " + chosenRecipe.getName() + " is not possible to make.");
+      }
+
+    } else {
+      System.out.println("Recipe " + choice + "was not found.");
+    }
+  }
+
+
 }
+
 
 

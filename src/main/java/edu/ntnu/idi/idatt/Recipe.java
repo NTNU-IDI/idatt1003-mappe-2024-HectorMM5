@@ -7,11 +7,11 @@ import java.util.ArrayList;
  */
 
 public class Recipe {
-  public String name;
-  public String description;
-  public ArrayList<Grocery> foods;
-  private ArrayList<String> instructions;
-  private int portions;
+  private final String name;
+  private final String description;
+  private final ArrayList<Grocery> foods;
+  private final ArrayList<String> instructions;
+  private final int portions;
 
   /**
    * Recipe constructor.
@@ -38,7 +38,8 @@ public class Recipe {
 
   public void writeRecipe() {
     //Prints out a small presentation
-    System.out.println("Recipe " + this.name + "\n" + this.description + "\n\nYou need:");
+    System.out.println("Recipe " + this.name + " - " + this.portions + " portions"
+        + "\n" + this.description + "\n\nYou need:");
 
     //For each specified ingredient, print out the name, amount and unit in a string.
     for (Grocery food : this.foods) {
@@ -50,6 +51,26 @@ public class Recipe {
     for (int i = 0; i < this.instructions.size(); i++) {
       System.out.println(i + "." + this.instructions.get(i));
     }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public ArrayList<Grocery> getFoods() {
+    return new ArrayList<>(foods); // Return a defensive copy
+  }
+
+  public ArrayList<String> getInstructions() {
+    return new ArrayList<>(instructions); // Return a defensive copy
+  }
+
+  public int getPortions() {
+    return portions;
   }
 
 

@@ -8,7 +8,7 @@ import java.util.Scanner;
  * Saves individual dishes with their respective names, ingredients, descriptions and instructions.
  */
 public class CookBook {
-  ArrayList<Recipe> cookBook = new ArrayList<>();
+  ArrayList<Recipe> recipeList = new ArrayList<>();
 
   /**
    * Guides the user through the creation of a recipe.
@@ -16,7 +16,7 @@ public class CookBook {
 
   public void createRecipe(String name, String description, ArrayList<String> instructions,
                            ArrayList<Grocery> food, int portions) {
-    cookBook.add(new Recipe(name, description, instructions, food, portions));
+    recipeList.add(new Recipe(name, description, instructions, food, portions));
   }
 
   /**
@@ -24,8 +24,8 @@ public class CookBook {
    */
   public void viewRecipes() {
     System.out.println("Your saved recipes:");
-    for (int i = 0; i < cookBook.size(); i++) {
-      System.out.println(i + 1 + ". " + cookBook.get(i).name);
+    for (int i = 0; i < recipeList.size(); i++) {
+      System.out.println(i + 1 + ". " + recipeList.get(i).getName());
 
     }
 
@@ -36,14 +36,14 @@ public class CookBook {
    *
    * @param fridge * Fridge object, necessary to access its contents.
    */
-  public void recipeAvailability(Fridge fridge) {
+  public ArrayList<Recipe> recipeAvailability(Fridge fridge) {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
-    for (Recipe recipe : cookBook) {
-      int maxIngredients = recipe.foods.size();
+    for (Recipe recipe : recipeList) {
+      int maxIngredients = recipe.getFoods().size();
       int ingredientsOk = 0;
-      for (Grocery food : recipe.foods) {
+      for (Grocery food : recipe.getFoods()) {
         for (Grocery ingredient : fridge.ingredients) {
           if (food.getName()
               .equalsIgnoreCase(ingredient.getName())) {
@@ -60,12 +60,7 @@ public class CookBook {
 
     }
 
-    System.out.println("With the ingredients you have, you are able to make:");
-
-    for (int i = 0; i < availableRecipes.size(); i++) {
-      System.out.println(i + ". " + availableRecipes.get(i).name);
-
-    }
+    return availableRecipes;
 
   }
 
@@ -76,10 +71,10 @@ public class CookBook {
    * @param fridge * Fridge object to access groceries.
    */
 
-  public void recipeCheck(Recipe recipe, Fridge fridge) {
-    int maxIngredients = recipe.foods.size();
+  public Boolean recipeCheck(Recipe recipe, Fridge fridge) {
+    int maxIngredients = recipe.getFoods().size();
     int ingredientsOk = 0;
-    for (Grocery ingredient : recipe.foods) {
+    for (Grocery ingredient : recipe.getFoods()) {
       for (Grocery food : fridge.ingredients) {
         if (ingredient.getName()
             .equalsIgnoreCase(food.getName())) {
@@ -92,7 +87,9 @@ public class CookBook {
     }
 
     if (maxIngredients == ingredientsOk) {
-      System.out.println("You have enough ingredients to make this dish.");
+      return true;
     }
+
+    return false;
   }
 }
