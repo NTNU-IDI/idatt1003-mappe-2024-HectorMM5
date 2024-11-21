@@ -18,83 +18,68 @@ public class ValidateInput {
    * @return The validated string.
    * @throws IllegalArgumentException if the input is null or empty.
    */
-  public static String ForceValidString(Scanner scanner) {
+  public static String forceValidString(Scanner scanner) {
 
-    String input = scanner.nextLine();
+    String input = null;
+    boolean isValid = false;
 
-    if (input == null || input.trim().isEmpty()) {
-      throw new IllegalArgumentException("Input cannot be null or empty.");
+    while (!isValid) {
+      input = scanner.nextLine();
+      if (!(input == null || input.trim().isEmpty())) {
+        isValid = true;
+      } else {
+        System.out.println("Please enter a valid string.");
+      }
     }
+
     return input.trim();
   }
 
-  /**
-   * Validates a numeric input in string format and converts it to a float.
-   *
-   * @param input The string to validate.
-   * @return The validated float value.
-   * @throws IllegalArgumentException if the input is not a valid number or is negative.
-   */
-  public static float validateFloat(String input) {
-    try {
-      float value = Float.parseFloat(input.trim());
-      if (value <= 0) {
-        throw new IllegalArgumentException("Value cannot be negative or zero.");
+
+  public static float forceValidFloat(Scanner scanner) {
+    float value = 0;
+    boolean isValid = false;
+
+    while (!isValid) {
+      try {
+        value = Float.parseFloat(scanner.nextLine().trim());
+        if (value > 0) {
+          isValid = true;
+        } else {
+          System.out.println("Value must be greater than zero.");
+        }
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid numeric value. Try again.");
       }
-      return value;
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Invalid numeric value. Please enter a valid number.", e);
     }
+
+    return value;
   }
 
   /**
-   * Validates a numeric input in string format and converts it to an integer.
+   * Validates a numeric input from the user and converts it to an integer.
    *
-   * @param input The string to validate.
    * @return The validated integer value.
-   * @throws IllegalArgumentException if the input is not a valid integer or is negative.
    */
-  public static int validateInteger(String input) {
-    try {
-      int value = Integer.parseInt(input.trim());
-      if (value < 0) {
-        throw new IllegalArgumentException("Value cannot be negative.");
+
+  public static int forceValidInteger(Scanner scanner) {
+    int value = 0;
+    boolean isValid = false;
+
+    while (!isValid) {
+      try {
+        value = Integer.parseInt(scanner.nextLine().trim());
+        if (value > 0) {
+          isValid = true;
+        } else {
+          System.out.println("Value must be greater than zero.");
+        }
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid numeric value. Try again.");
       }
-      return value;
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Invalid integer value. Please enter a valid number.", e);
     }
+
+    return value;
   }
 
-  /**
-   * Validates a date input in a specified format and converts it to a LocalDate object.
-   *
-   * @param input The string to validate.
-   * @param format The expected date format (e.g., "ddMMyyyy").
-   * @return The validated LocalDate object.
-   * @throws IllegalArgumentException if the input does not match the format or is invalid.
-   */
-  public static LocalDate validateDate(String input, String format) {
-    try {
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-      return LocalDate.parse(input.trim(), formatter);
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException("Invalid date format. Please enter the date in the format " + format + ".", e);
-    }
-  }
-
-  /**
-   * Validates that a string matches a specific pattern.
-   *
-   * @param input The string to validate.
-   * @param regex The regular expression pattern to match.
-   * @return The validated string.
-   * @throws IllegalArgumentException if the input does not match the pattern.
-   */
-  public static String validatePattern(String input, String regex) {
-    if (!input.matches(regex)) {
-      throw new IllegalArgumentException("Input does not match the required pattern.");
-    }
-    return input.trim();
-  }
 }
