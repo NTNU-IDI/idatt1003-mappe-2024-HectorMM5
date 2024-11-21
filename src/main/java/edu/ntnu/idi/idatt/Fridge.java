@@ -3,7 +3,10 @@ package edu.ntnu.idi.idatt;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
 
 
 
@@ -13,7 +16,7 @@ import java.util.Scanner;
 
 public class Fridge {
 
-  public ArrayList<Grocery> ingredients = new ArrayList<>();
+  public static ArrayList<Grocery> ingredients = new ArrayList<>();
   Scanner scanner = new Scanner(System.in);
 
   /**
@@ -32,16 +35,18 @@ public class Fridge {
    */
 
   public void use(String name, float consume) {
-    for (int i = 0; i < ingredients.size(); i++) {
-      if (ingredients.get(i).getName().equalsIgnoreCase(name)) {
-        ingredients.get(i).use(consume);
-        if (ingredients.get(i).getAmount() == 0) {
-          ingredients.remove(i);
-          i -= 1;
-        }
+    Iterator<Grocery> iterator = ingredients.iterator();
+    boolean found = false;
 
-      } else if (i == ingredients.size() - 1) {
-        System.out.println("The ingredient you're looking for does not exist. Check for typos.");
+    while (iterator.hasNext()) {
+      Grocery ingredient = iterator.next();
+      if (ingredient.getName().equalsIgnoreCase(name)) {
+        ingredient.use(consume);
+        if (ingredient.getAmount() == 0) {
+          iterator.remove(); // Safe removal
+        }
+        found = true;
+        break; // Exit the loop after finding the ingredient
       }
     }
   }
@@ -64,19 +69,17 @@ public class Fridge {
   /**
    * Prints a sorted overview of the ingredients.
    */
-  public void overview() {
+  public ArrayList<Grocery> overview() {
     ingredients.sort(Comparator.comparing(Grocery::getName));
-    for (Grocery ingredient : ingredients) {
-      System.out.println(
-          ingredient.getName() + ": " + ingredient.getAmount() + " "
-              + ingredient.getUnit() + ".");
-    }
+    return ingredients;
+
   }
 
   /**
    * Writes out an overview of the ingredients that have expired.
    */
   public void dateOverview() {
+    ingredients.sort(Comparator.comparing(Grocery::getName));
     float sum = 0;
     System.out.println("The following items have expired:");
     for (Grocery ingredient : ingredients) {
