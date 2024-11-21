@@ -23,6 +23,9 @@ public class UserInterface {
   public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
     String input;
 
+    System.out.println("Welcome to the fridge. Write in a command below, or write \"help\" to "
+        + "check all the available commands.");
+
     while (true) {
       input = scanner.nextLine();
 
@@ -75,32 +78,17 @@ public class UserInterface {
 
   private void handleNewItem(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery.");
-    final String name = scanner.nextLine();
+    final String name = ValidateInput.forceValidString(scanner);
 
     System.out.println("Write the unit of the grocery.");
-    final String unit = scanner.nextLine();
+    final String unit = ValidateInput.forceValidString(scanner);
 
     System.out.println("Enter the amount (in numeric format):");
-    float amount;
-    while (true) {
-      try {
-        amount = Float.parseFloat(scanner.nextLine());
-        break;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter a numeric value for amount:");
-      }
-    }
+    final float amount = ValidateInput.forceValidFloat(scanner);
 
     System.out.println("Enter the cost (of the total amount):");
-    float cost;
-    while (true) {
-      try {
-        cost = Float.parseFloat(scanner.nextLine());
-        break;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter a numeric value for cost:");
-      }
-    }
+    float cost = ValidateInput.forceValidFloat(scanner);
+
 
     System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
     LocalDate expiryDate;
@@ -119,18 +107,10 @@ public class UserInterface {
 
   private void handleUse(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery you want to use:");
-    String groceryName = scanner.nextLine();
+    String groceryName = ValidateInput.forceValidString(scanner);
 
     System.out.println("Write the amount you want to use:");
-    float consume;
-    while (true) {
-      try {
-        consume = Float.parseFloat(scanner.nextLine());
-        break;
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input, please enter a numeric value.");
-      }
-    }
+    float consume = ValidateInput.forceValidFloat(scanner);
 
     try {
       fridge.use(groceryName, consume);
@@ -141,7 +121,7 @@ public class UserInterface {
 
   private void handleSearch(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery:");
-    String groceryName = scanner.nextLine();
+    String groceryName = ValidateInput.forceValidString(scanner);
 
     Grocery result = fridge.search(groceryName);
     if (result != null) {
@@ -153,7 +133,11 @@ public class UserInterface {
   }
 
   private void handleOverview(Fridge fridge) {
-    fridge.overview();
+    for (Grocery ingredient : fridge.overview()) {
+      System.out.println(
+          ingredient.getName() + ": " + ingredient.getAmount() + " "
+              + ingredient.getUnit() + ".");
+    }
   }
 
   private void handleExpiredOverview(Fridge fridge) {
