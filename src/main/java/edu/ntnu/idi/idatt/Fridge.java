@@ -22,7 +22,6 @@ public class Fridge {
 
   public void newGrocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
     ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
-    System.out.println("Your grocery has been put in the fridge.");
   }
 
   /**

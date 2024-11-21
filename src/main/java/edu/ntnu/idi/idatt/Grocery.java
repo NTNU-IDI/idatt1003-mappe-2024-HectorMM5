@@ -36,6 +36,7 @@ public class Grocery {
 
   /**
    * Creates a grocery item with these parameters, generally kept for cookbook purposes.
+   * (Recipes are not dependent on item cost or item expiry dates).
    *
    * @param name   name of grocery
    * @param unit   unit of grocery
