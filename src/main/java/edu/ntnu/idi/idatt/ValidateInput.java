@@ -3,17 +3,25 @@ package edu.ntnu.idi.idatt;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Scanner;
+
+/**
+ * Class dedicated to validating user input. Improves readability and avoids cluttered code.
+ */
 
 public class ValidateInput {
+  Scanner scanner = new Scanner(System.in);
 
   /**
    * Validates a string input ensuring it is not null or empty.
    *
-   * @param input The string to validate.
    * @return The validated string.
    * @throws IllegalArgumentException if the input is null or empty.
    */
-  public static String validateString(String input) {
+  public static String ForceValidString(Scanner scanner) {
+
+    String input = scanner.nextLine();
+
     if (input == null || input.trim().isEmpty()) {
       throw new IllegalArgumentException("Input cannot be null or empty.");
     }
