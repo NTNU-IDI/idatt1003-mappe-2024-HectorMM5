@@ -11,7 +11,14 @@ import java.util.stream.Collectors;
  * Saves individual dishes with their respective names, ingredients, descriptions and instructions.
  */
 public class CookBook {
-  ArrayList<Recipe> recipeList = new ArrayList<>();
+  static final ArrayList<Recipe> recipeList = new ArrayList<>();
+
+  /**
+   * Searches for and returns a recipe-object with the given name.
+   *
+   * @param name * recipe/dish's name
+   * @return * Dish object, if found. Otherwise, return null.
+   */
 
   public Recipe search(String name) {
     return recipeList.stream()
@@ -94,10 +101,6 @@ public class CookBook {
       }
     }
 
-    if (maxIngredients == ingredientsOk) {
-      return true;
-    }
-
-    return false;
+    return (maxIngredients == ingredientsOk);
   }
 }

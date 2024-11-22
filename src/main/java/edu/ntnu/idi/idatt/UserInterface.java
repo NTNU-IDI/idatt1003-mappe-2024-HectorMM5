@@ -15,7 +15,6 @@ public class UserInterface {
   /**
    * Handles the users actions in an infinite loop, until the program is terminated.
    *
-   *
    * @param scanner * Scanner object to take in user input.
    * @param fridge * Fridge object as food storage reference.
    * @param cookBook * Cookbook object with a set of saved recipes.
@@ -27,7 +26,7 @@ public class UserInterface {
         + "check all the available commands.");
 
     while (true) {
-      input = scanner.nextLine();
+      input = ValidateInput.forceValidString(scanner);
 
       switch (input) {
         case "/newItem":
@@ -169,10 +168,10 @@ public class UserInterface {
     System.out.println("Now creating a new recipe.");
 
     System.out.println("Write the name of the dish:");
-    final String dishName = scanner.nextLine().trim();
+    final String dishName = ValidateInput.forceValidString(scanner);
 
     System.out.println("Write a short description of the dish:");
-    final String description = scanner.nextLine().trim();
+    final String description = ValidateInput.forceValidString(scanner);
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
     System.out.println("Specify the ingredients in the format: name, amount, unit.");
