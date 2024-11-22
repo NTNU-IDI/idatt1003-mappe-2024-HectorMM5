@@ -32,29 +32,6 @@ public class Recipe {
 
   }
 
-
-
-  /**
-   * Prints out a recipe presentation and step-by-step guide.
-   */
-
-  public void writeRecipe() {
-    //Prints out a small presentation
-    System.out.println("Recipe " + this.name + " - " + this.portions + " portions"
-        + "\n" + this.description + "\n\nYou need:");
-
-    //For each specified ingredient, print out the name, amount and unit in a string.
-    for (Grocery food : this.foods) {
-      System.out.println(
-          "    - " + food.getAmount() + " " + food.getUnit() + " "
-              + food.getName());
-    }
-    System.out.println("\nInstructions:");
-    for (int i = 0; i < this.instructions.size(); i++) {
-      System.out.println(i + "." + this.instructions.get(i));
-    }
-  }
-
   public String getName() {
     return name;
   }

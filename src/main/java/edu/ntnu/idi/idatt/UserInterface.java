@@ -125,8 +125,11 @@ public class UserInterface {
 
     ArrayList<Grocery> result = fridge.search(groceryName);
     if (result != null) {
-      System.out.println("The ingredient " + result.getName() + " exists, you have "
-          + result.getAmount() + " " + result.getUnit() + ".");
+      for (Grocery grocery : result) {
+        System.out.println("The ingredient " + grocery.getName() + " exists, you have "
+            + grocery.getAmount() + " " + grocery.getUnit() + ".");
+      }
+
     } else {
       System.out.println("The ingredient you're looking for does not exist.");
     }
@@ -258,6 +261,35 @@ public class UserInterface {
 
     } else {
       System.out.println("Recipe " + choice + "was not found.");
+    }
+  }
+
+  void handlePrintRecipe(Scanner scanner, CookBook cookBook) {
+    System.out.println("What recipe do you want to print?");
+    String choice = ValidateInput.forceValidString(scanner);
+    Recipe recipe = cookBook.search(choice);
+    if (recipe == null) {
+      System.out.println("Recipe " + choice + " was not found.");
+    } else {
+
+      //Prints out a small presentation
+      System.out.println("Recipe " + recipe.getName() + " - " + recipe.getPortions() + " portions"
+          + "\n" + recipe.getDescription() + "\n\nYou need:");
+
+      //For each specified ingredient, print out the name, amount and unit in a string.
+      for (Grocery food : recipe.getFoods()) {
+        System.out.println(
+            "    - " + food.getAmount() + " " + food.getUnit() + " "
+                + food.getName());
+      }
+      System.out.println("\nInstructions:");
+      //For each step in instructions, print out the instruction.
+      //Keeping i in the loop for numbering of steps.
+      for (int i = 0; i < recipe.getInstructions().size(); i++) {
+        System.out.println(i + "." + recipe.getInstructions().get(i));
+      }
+
+
     }
   }
 

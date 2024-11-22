@@ -13,6 +13,14 @@ import java.util.stream.Collectors;
 public class CookBook {
   ArrayList<Recipe> recipeList = new ArrayList<>();
 
+  public Recipe search(String name) {
+    return recipeList.stream()
+        .filter(recipe -> recipe.getName().equalsIgnoreCase(name))
+        .findFirst()
+        .orElse(null);
+
+  }
+
   /**
    * Guides the user through the creation of a recipe.
    */
