@@ -10,14 +10,13 @@ import java.util.Scanner;
  */
 
 public class ValidateInput {
-  Scanner scanner = new Scanner(System.in);
-
   /**
    * Validates a string input ensuring it is not null or empty.
    *
    * @return The validated string.
    * @throws IllegalArgumentException if the input is null or empty.
    */
+
   public static String forceValidString(Scanner scanner) {
 
     String input = null;
