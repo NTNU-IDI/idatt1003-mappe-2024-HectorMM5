@@ -123,7 +123,7 @@ public class UserInterface {
     System.out.println("Write the name of the grocery:");
     String groceryName = ValidateInput.forceValidString(scanner);
 
-    Grocery result = fridge.search(groceryName);
+    ArrayList<Grocery> result = fridge.search(groceryName);
     if (result != null) {
       System.out.println("The ingredient " + result.getName() + " exists, you have "
           + result.getAmount() + " " + result.getUnit() + ".");

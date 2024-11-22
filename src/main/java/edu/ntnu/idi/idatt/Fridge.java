@@ -7,22 +7,17 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-
-
-
 /**
  * Fridge represents the food storage, keeping accessible grocery objects.
  */
-
 public class Fridge {
 
-  public static ArrayList<Grocery> ingredients = new ArrayList<>();
+  static ArrayList<Grocery> ingredients = new ArrayList<>();
   Scanner scanner = new Scanner(System.in);
 
   /**
    * Guides the user through creating a new grocery item.
    */
-
   public void newGrocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
     ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
   }
@@ -30,23 +25,19 @@ public class Fridge {
   /**
    * Finds and takes out a given amount of an item within the fridge.
    *
-   * @param name * Ingredient's name.
+   * @param name    * Ingredient's name.
    * @param consume * Amount to be consumed.
    */
-
   public void use(String name, float consume) {
     Iterator<Grocery> iterator = ingredients.iterator();
-    boolean found = false;
 
     while (iterator.hasNext()) {
       Grocery ingredient = iterator.next();
       if (ingredient.getName().equalsIgnoreCase(name)) {
         ingredient.use(consume);
         if (ingredient.getAmount() == 0) {
-          iterator.remove(); // Safe removal
+          iterator.remove();
         }
-        found = true;
-        break; // Exit the loop after finding the ingredient
       }
     }
   }
@@ -54,68 +45,71 @@ public class Fridge {
   /**
    * Allows the user to search for an ingredient within the fridge.
    *
-   * @param argument * Ingredient's name.
+   * @param name * Ingredient's name.
+   * @return List of matching Grocery objects.
    */
-
-  public Grocery search(String argument) {
-    for (Grocery ingredient : ingredients) {
-      if (ingredient.getName().equalsIgnoreCase(argument)) {
-        return ingredient;
-      }
-    }
-    return null;
+  public ArrayList<Grocery> search(String name) {
+    return ingredients.stream()
+        .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
-   * Prints a sorted overview of the ingredients.
+   * Returns a sorted overview of the ingredients.
+   *
+   * @return A new sorted list of all ingredients.
    */
   public ArrayList<Grocery> overview() {
-    ingredients.sort(Comparator.comparing(Grocery::getName));
-    return ingredients;
-
+    return ingredients.stream()
+        .sorted(Comparator.comparing(Grocery::getName))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
-   * Writes out an overview of the ingredients that have expired.
+   * Returns all the ingredients that have expired.
+   *
+   * @return A new list of all expired ingredients.
    */
-  public void dateOverview() {
-    ingredients.sort(Comparator.comparing(Grocery::getName));
-    float sum = 0;
-    System.out.println("The following items have expired:");
-    for (Grocery ingredient : ingredients) {
-      if (ingredient.getExpiryDate().isBefore(LocalDate.now())) {
-        System.out.println(
-            ingredient.getName() + ": " + ingredient.getAmount() + " "
-                + ingredient.getUnit() + ".");
-
-        sum += ingredient.getCost() * ingredient.getAmount();
-      }
-    }
-
-    System.out.println("You have a total of " + Math.round(sum) + " euros worth of expired food.");
-  }
-
-  public void expiresBefore(LocalDate date) {
-    System.out.println("The following items will expire before the given date:");
-    for (Grocery ingredient : ingredients) {
-      if (ingredient.getExpiryDate().isBefore(date)) {
-        System.out.println(
-            ingredient.getName() + ": " + ingredient.getAmount() + " "
-                + ingredient.getUnit() + ".");
-      }
-    }
+  public ArrayList<Grocery> dateOverview() {
+    return ingredients.stream()
+        .sorted(Comparator.comparing(Grocery::getName))
+        .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
-   * Prints out the value of all the ingredients in the fridge.
+   * Calculates the total value of a given list of groceries.
+   *
+   * @param groceries The list of groceries to calculate the value for.
+   * @return The total value of the groceries as an integer.
+   */
+  public int calculateValue(ArrayList<Grocery> groceries) {
+    float sum = 0;
+    for (Grocery grocery : groceries) {
+      sum += grocery.getAmount() * grocery.getCost();
+    }
+    return Math.round(sum);
+  }
+
+  /**
+   * Prints a list of items that will expire before a given date.
+   *
+   * @param date The date to compare against.
+   */
+  public ArrayList<Grocery> expiresBefore(LocalDate date) {
+    return ingredients.stream()
+        .filter(ingredient -> ingredient.getExpiryDate().isBefore(date))
+        .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  /**
+   * Prints out the total value of all ingredients in the fridge.
    */
   public void value() {
-
     float value = 0f;
     for (Grocery ingredient : ingredients) {
       value += ingredient.getCost() * ingredient.getAmount();
     }
-
     System.out.println("The value of the content is " + value + " euros.");
   }
 
@@ -135,5 +129,4 @@ public class Fridge {
         "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
     System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
   }
-
 }

@@ -1,7 +1,10 @@
 package edu.ntnu.idi.idatt;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Class that represents a cookbook.
@@ -20,15 +23,12 @@ public class CookBook {
   }
 
   /**
-   * Allows the user to view the created recipes.
+   * Returns an ArrayList of all the created recipes.
    */
-  public void viewRecipes() {
-    System.out.println("Your saved recipes:");
-    for (int i = 0; i < recipeList.size(); i++) {
-      System.out.println(i + 1 + ". " + recipeList.get(i).getName());
-
-    }
-
+  public ArrayList<Recipe> getRecipes() {
+    return recipeList.stream()
+        .sorted(Comparator.comparing(Recipe::getName))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
