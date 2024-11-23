@@ -62,11 +62,11 @@ public class UserInterface {
           break;
 
         case "/availableRecipes":
-          handleAvailableRecipes(fridge, cookBook);
+          handleAvailableRecipes(cookBook, fridge);
           break;
 
         case "/checkRecipe":
-          handleCheckRecipe(scanner, cookBook, fridge);
+          handleCheckRecipe(scanner, fridge, cookBook);
           break;
 
         default:
@@ -161,7 +161,7 @@ public class UserInterface {
   }
 
   private void handleValue(Fridge fridge) {
-    fridge.value();
+    fridge.calculateValue(Fridge.ingredients);
   }
 
   private void handleCreateRecipe(Scanner scanner, CookBook cookBook) {
@@ -231,19 +231,19 @@ public class UserInterface {
   }
 
 
-  void handleAvailableRecipes(Fridge fridge, CookBook cookBook) {
+  void handleAvailableRecipes(CookBook cookBook, Fridge fridge) {
     System.out.println("With the ingredients you have, you are able to make:");
     for (Recipe recipe : cookBook.recipeAvailability(fridge)) {
       System.out.println("  - " + recipe.getName());
     }
   }
 
-  void handleCheckRecipe(Scanner scanner, CookBook cookBook, Fridge fridge) {
+  void handleCheckRecipe(Scanner scanner, Fridge fridge, CookBook cookBook) {
     System.out.println("What recipe do you want to check?");
     String choice = scanner.nextLine().trim();
 
     Recipe chosenRecipe = null;
-    for (Recipe recipe : cookBook.recipeList) {
+    for (Recipe recipe : CookBook.recipeList) {
       if (recipe.getName().equalsIgnoreCase(choice)) {
         chosenRecipe = recipe;
       }
@@ -290,6 +290,23 @@ public class UserInterface {
 
 
     }
+  }
+
+  /**
+   * Prints out an overview of all the commands.
+   */
+  void help() {
+    System.out.println("--------------------------------------------------------");
+    System.out.println("An overview of available commands can be seen below:");
+    System.out.println("--------------------------------------------------------");
+    System.out.println("\n    - \"/newItem\" to add a new item.");
+    System.out.println("    - \"/use\" to retrieve an item.");
+    System.out.println(
+        "    - \"/search\" to search for an item and retrieve associated information.");
+    System.out.println("    - \"/overview\" to check everything that is currently in the fridge.");
+    System.out.println(
+        "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
+    System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
   }
 
 

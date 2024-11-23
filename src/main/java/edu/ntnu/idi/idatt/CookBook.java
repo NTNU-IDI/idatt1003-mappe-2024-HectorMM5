@@ -1,9 +1,8 @@
 package edu.ntnu.idi.idatt;
 
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -19,7 +18,6 @@ public class CookBook {
    * @param name * recipe/dish's name
    * @return * Dish object, if found. Otherwise, return null.
    */
-
   public Recipe search(String name) {
     return recipeList.stream()
         .filter(recipe -> recipe.getName().equalsIgnoreCase(name))
@@ -31,7 +29,6 @@ public class CookBook {
   /**
    * Guides the user through the creation of a recipe.
    */
-
   public void createRecipe(String name, String description, ArrayList<String> instructions,
                            ArrayList<Grocery> food, int portions) {
     recipeList.add(new Recipe(name, description, instructions, food, portions));
@@ -48,31 +45,16 @@ public class CookBook {
 
   /**
    * Shows which recipes are available with the current groceries stored in the fridge.
-   *
-   * @param fridge * Fridge object, necessary to access its contents.
    */
   public ArrayList<Recipe> recipeAvailability(Fridge fridge) {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
     for (Recipe recipe : recipeList) {
-      int maxIngredients = recipe.getFoods().size();
-      int ingredientsOk = 0;
-      for (Grocery food : recipe.getFoods()) {
-        for (Grocery ingredient : fridge.ingredients) {
-          if (food.getName()
-              .equalsIgnoreCase(ingredient.getName())) {
-            if (ingredient.getAmount() >= food.getAmount()) {
-              ingredientsOk += 1;
-            }
-          }
-        }
-      }
-
-      if (maxIngredients == ingredientsOk) {
+      //If returned boolean is true
+      if (recipeCheck(recipe, fridge)) {
         availableRecipes.add(recipe);
       }
-
     }
 
     return availableRecipes;
@@ -83,24 +65,22 @@ public class CookBook {
    * Checks if a given recipe can be made with the current items in the fridge.
    *
    * @param recipe * The recipe in question.
-   * @param fridge * Fridge object to access groceries.
    */
-
   public Boolean recipeCheck(Recipe recipe, Fridge fridge) {
-    int maxIngredients = recipe.getFoods().size();
-    int ingredientsOk = 0;
-    for (Grocery ingredient : recipe.getFoods()) {
-      for (Grocery food : fridge.ingredients) {
-        if (ingredient.getName()
-            .equalsIgnoreCase(food.getName())) {
-          if (food.getAmount() >= ingredient.getAmount()) {
-            ingredientsOk += 1;
+    //ChatGPT
+    return recipe.getFoods().stream()
+        //All instances of food (all Grocery objects within recipe) must match the condition.
+        .allMatch(food -> {
+          // Use the search method to get all groceries with the same name
+          ArrayList<Grocery> matchingGroceries = fridge.search(food.getName());
 
-          }
-        }
-      }
-    }
+          // Calculate the quantity of matching groceries
+          float totalAmount = matchingGroceries.stream()
+              .map(Grocery::getAmount)
+              .reduce(0f, Float::sum);
 
-    return (maxIngredients == ingredientsOk);
+          // Check if the total amount is sufficient
+          return totalAmount >= food.getAmount(); //If true, this food object is approved.
+        });
   }
 }

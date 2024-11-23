@@ -76,11 +76,8 @@ public class Grocery {
    */
 
   public void setAmount(float amount) {
-    if (amount <= 0) {
-      throw new IllegalArgumentException("Amount must be greater than zero.");
-    } else {
-      this.amount = amount;
-    }
+    this.amount = amount;
+
   }
 
   /**

@@ -127,7 +127,7 @@ public class FridgeTest {
 
   @Test
   void help() {
-    fridge.help();
+    UserInterface.help();
 
     // Check that the output contains key command descriptions
     assertTrue(outContent.toString().contains("\n    - \"/newItem\" to add a new item."));

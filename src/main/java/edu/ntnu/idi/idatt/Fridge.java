@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -12,8 +11,7 @@ import java.util.stream.Collectors;
  */
 public class Fridge {
 
-  static ArrayList<Grocery> ingredients = new ArrayList<>();
-  Scanner scanner = new Scanner(System.in);
+  static final ArrayList<Grocery> ingredients = new ArrayList<>();
 
   /**
    * Guides the user through creating a new grocery item.
@@ -28,17 +26,33 @@ public class Fridge {
    * @param name    * Ingredient's name.
    * @param consume * Amount to be consumed.
    */
-  public void use(String name, float consume) {
-    Iterator<Grocery> iterator = ingredients.iterator();
+  public Boolean use(String name, float consume) {
+    ArrayList<Grocery> matchingGroceries = search(name).stream()
+        //Sorts based on the earliest expiry date
+        .sorted(Comparator.comparing(Grocery::getExpiryDate))
+        .collect(Collectors.toCollection(ArrayList::new));
 
-    while (iterator.hasNext()) {
-      Grocery ingredient = iterator.next();
-      if (ingredient.getName().equalsIgnoreCase(name)) {
-        ingredient.use(consume);
-        if (ingredient.getAmount() == 0) {
+    float totalAmount = matchingGroceries.stream()
+        .map(Grocery::getAmount)
+        .reduce(0f, Float::sum);
+
+    if (totalAmount > consume) {
+      Iterator<Grocery> iterator = matchingGroceries.iterator();
+
+      while (consume > 0) {
+        Grocery grocery = iterator.next();
+        if (grocery.getAmount() > consume) {
+          grocery.setAmount(grocery.getAmount() - consume);
+        } else {
+          consume -= grocery.getAmount();
+          grocery.setAmount(0);
           iterator.remove();
         }
       }
+      return true;
+
+    } else {
+      return false;
     }
   }
 
@@ -102,31 +116,4 @@ public class Fridge {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  /**
-   * Prints out the total value of all ingredients in the fridge.
-   */
-  public void value() {
-    float value = 0f;
-    for (Grocery ingredient : ingredients) {
-      value += ingredient.getCost() * ingredient.getAmount();
-    }
-    System.out.println("The value of the content is " + value + " euros.");
-  }
-
-  /**
-   * Prints out an overview of all the commands.
-   */
-  public void help() {
-    System.out.println("--------------------------------------------------------");
-    System.out.println("An overview of available commands can be seen below:");
-    System.out.println("--------------------------------------------------------");
-    System.out.println("\n    - \"/newItem\" to add a new item.");
-    System.out.println("    - \"/use\" to retrieve an item.");
-    System.out.println(
-        "    - \"/search\" to search for an item and retrieve associated information.");
-    System.out.println("    - \"/overview\" to check everything that is currently in the fridge.");
-    System.out.println(
-        "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
-    System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
-  }
 }

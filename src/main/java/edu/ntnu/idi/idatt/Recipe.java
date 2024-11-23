@@ -41,11 +41,11 @@ public class Recipe {
   }
 
   public ArrayList<Grocery> getFoods() {
-    return new ArrayList<>(foods); // Return a defensive copy
+    return foods;
   }
 
   public ArrayList<String> getInstructions() {
-    return new ArrayList<>(instructions); // Return a defensive copy
+    return instructions;
   }
 
   public int getPortions() {
