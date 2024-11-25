@@ -81,22 +81,14 @@ public class Grocery {
   }
 
   /**
-   * Uses a given amount of the total amount.
-   *
-   * @param amount * Amount to be consumed.
+   * String representing the object's state. Used for user information.
    */
 
-  public void use(float amount) {
-    if (amount <= 0) {
-      throw new IllegalArgumentException("Amount must be greater than zero.");
-    } else if (this.amount < amount) {
-      throw new IllegalStateException("Not enough " + this.name + " to use the specified amount.");
-    } else {
-      this.amount -= amount;
-      System.out.println("You take out " + amount + " " + this.getUnit() + " "
-          + this.getName() + ", and have " + this.getAmount() + " "
-          + this.getUnit() + " left.");
-    }
+  @Override
+  public String toString() {
+    return (name + " " + amount + " " + unit + " " + "(costs " + cost + " euros per " + unit
+        + ") " + "(" + expiryDate + ")");
+
   }
 
 }
