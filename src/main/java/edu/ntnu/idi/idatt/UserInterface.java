@@ -126,7 +126,7 @@ public class UserInterface {
           break;
 
         case "/listRecipes":
-          handleListRecipes(cookBook);
+          handleAllRecipes(cookBook);
           break;
 
         case "/deleteRecipe":
@@ -135,6 +135,10 @@ public class UserInterface {
 
         case "/help":
           cookBookHelp();
+          break;
+
+        case "/back":
+          running = false;
           break;
 
         default:
@@ -358,8 +362,12 @@ public class UserInterface {
       for (int i = 0; i < recipe.getInstructions().size(); i++) {
         System.out.println(i + "." + recipe.getInstructions().get(i));
       }
+    }
+  }
 
-
+  void handleAllRecipes(CookBook cookBook) {
+    for (Recipe recipe : cookBook.getRecipes()) {
+      System.out.println(recipe.getName() + " - " + recipe.getPortions() + " portions");
     }
   }
 
@@ -378,6 +386,7 @@ public class UserInterface {
     System.out.println(
         "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
     System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
+    System.out.println("-   - \"/back\" to return to the main menu.");
   }
 
   /**
