@@ -89,7 +89,7 @@ public class UserInterface {
     float cost = ValidateInput.forceValidFloat(scanner);
 
 
-    System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
+    System.out.println("Enter the expiry date (DDMMYYYY):");
     LocalDate expiryDate;
     while (true) {
       try {
@@ -170,64 +170,55 @@ public class UserInterface {
     System.out.println("Write the name of the dish:");
     final String dishName = ValidateInput.forceValidString(scanner);
 
-    System.out.println("Write a short description of the dish:");
-    final String description = ValidateInput.forceValidString(scanner);
+    //If no dish with this name already exists:
+    if (cookBook.search(dishName) == null) {
+      System.out.println("Write a short description of the dish:");
+      final String description = ValidateInput.forceValidString(scanner);
 
-    ArrayList<Grocery> ingredients = new ArrayList<>();
-    System.out.println("Specify the ingredients in the format: name, amount, unit.");
-    System.out.println("Write \"Done\" when finished.");
+      ArrayList<Grocery> ingredients = new ArrayList<>();
+      System.out.println("Specify the ingredients in the format: name, amount, unit.");
+      System.out.println("Write \"Done\" when finished.");
 
-    while (true) {
-      String line = scanner.nextLine();
-      if (line.equalsIgnoreCase("Done")) {
-        break;
-      }
+      String line = "";
+      while (!line.equalsIgnoreCase("Done")) {
+        line = ValidateInput.forceValidString(scanner);
 
-      String[] parts = line.split(",");
-      if (parts.length == 3) {
-        try {
-          float amount = Float.parseFloat(parts[1].trim());
-          if (amount > 0) {
-            ingredients.add(new Grocery(parts[0].trim(), parts[2].trim(), amount));
-          } else {
-            System.out.println("Amount must be positive. Try again.");
+        String[] parts = line.split(",");
+        if (parts.length == 3) {
+          try {
+            float amount = Float.parseFloat(parts[1].trim());
+            if (amount > 0) {
+              ingredients.add(new Grocery(parts[0].trim(), parts[2].trim(), amount));
+            } else {
+              System.out.println("Amount must be positive and larger than zero. Try again.");
+            }
+          } catch (NumberFormatException e) {
+            System.out.println("Invalid amount. Use numeric values.");
           }
-        } catch (NumberFormatException e) {
-          System.out.println("Invalid amount. Use numeric values.");
+        } else {
+          System.out.println("Invalid format. Use: name, amount, unit.");
         }
-      } else {
-        System.out.println("Invalid format. Use: name, amount, unit.");
       }
+
+      final ArrayList<String> instructions = new ArrayList<>();
+      System.out.println("Write the instructions, one line at a time.");
+      System.out.println("Write \"Done\" when finished.");
+
+      line = "";
+      while (!line.equalsIgnoreCase("Done")) {
+        line = ValidateInput.forceValidString(scanner);
+        instructions.add(line);
+      }
+
+      System.out.println("How many portions does this make?");
+      int portions = ValidateInput.forceValidInteger(scanner);
+
+      cookBook.createRecipe(dishName, description, instructions, ingredients, portions);
+      System.out.println("Recipe saved successfully.");
+    } else {
+      System.out.println("A recipe with the given name already exists.");
     }
 
-    ArrayList<String> instructions = new ArrayList<>();
-    System.out.println("Write the instructions, one line at a time.");
-    System.out.println("Write \"Done\" when finished.");
-
-    while (true) {
-      String line = scanner.nextLine();
-      if (line.equalsIgnoreCase("Done")) {
-        break;
-      }
-      instructions.add(line);
-    }
-
-    System.out.println("How many portions does this make?");
-    int portions = 0;
-    while (true) {
-      try {
-        portions = Integer.parseInt(scanner.nextLine());
-        if (portions > 0) {
-          break;
-        }
-        System.out.println("Portions must be positive. Try again.");
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid input. Use numeric values.");
-      }
-    }
-
-    cookBook.createRecipe(dishName, description, instructions, ingredients, portions);
-    System.out.println("Recipe saved successfully.");
   }
 
 
@@ -240,14 +231,9 @@ public class UserInterface {
 
   void handleCheckRecipe(Scanner scanner, Fridge fridge, CookBook cookBook) {
     System.out.println("What recipe do you want to check?");
-    String choice = scanner.nextLine().trim();
+    String choice = ValidateInput.forceValidString(scanner);
 
-    Recipe chosenRecipe = null;
-    for (Recipe recipe : CookBook.recipeList) {
-      if (recipe.getName().equalsIgnoreCase(choice)) {
-        chosenRecipe = recipe;
-      }
-    }
+    Recipe chosenRecipe = cookBook.search(choice);
 
     if (chosenRecipe != null) {
       Boolean found = cookBook.recipeCheck(chosenRecipe, fridge);
@@ -259,7 +245,7 @@ public class UserInterface {
       }
 
     } else {
-      System.out.println("Recipe " + choice + "was not found.");
+      System.out.println("Recipe " + choice + " was not found.");
     }
   }
 

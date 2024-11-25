@@ -21,39 +21,57 @@ public class Fridge {
   }
 
   /**
+   * Represents different outcomes for the "use" function.
+   * Used to give the user appropriate feedback.
+   */
+  public enum UseStatus {
+    SUCCESS,
+    INSUFFICIENT_AMOUNT,
+    ITEM_NOT_FOUND
+  }
+
+  /**
    * Finds and takes out a given amount of an item within the fridge.
    *
    * @param name    * Ingredient's name.
    * @param consume * Amount to be consumed.
    */
-  public Boolean use(String name, float consume) {
-    ArrayList<Grocery> matchingGroceries = search(name).stream()
-        //Sorts based on the earliest expiry date
-        .sorted(Comparator.comparing(Grocery::getExpiryDate))
-        .collect(Collectors.toCollection(ArrayList::new));
+  public UseStatus use(String name, float consume) {
 
-    float totalAmount = matchingGroceries.stream()
-        .map(Grocery::getAmount)
-        .reduce(0f, Float::sum);
+    ArrayList<Grocery> matchingGroceries = search(name);
 
-    if (totalAmount > consume) {
-      Iterator<Grocery> iterator = matchingGroceries.iterator();
+    if (!matchingGroceries.isEmpty()) {
+      matchingGroceries = matchingGroceries.stream()
+          //Sorts based on the earliest expiry date
+          .sorted(Comparator.comparing(Grocery::getExpiryDate))
+          .collect(Collectors.toCollection(ArrayList::new));
 
-      while (consume > 0) {
-        Grocery grocery = iterator.next();
-        if (grocery.getAmount() > consume) {
-          grocery.setAmount(grocery.getAmount() - consume);
-        } else {
-          consume -= grocery.getAmount();
-          grocery.setAmount(0);
-          iterator.remove();
+      float totalAmount = matchingGroceries.stream()
+          .map(Grocery::getAmount)
+          .reduce(0f, Float::sum);
+
+      if (totalAmount > consume) {
+        Iterator<Grocery> iterator = matchingGroceries.iterator();
+
+        while (consume > 0) {
+          Grocery grocery = iterator.next();
+          if (grocery.getAmount() > consume) {
+            grocery.setAmount(grocery.getAmount() - consume);
+          } else {
+            consume -= grocery.getAmount();
+            grocery.setAmount(0);
+            iterator.remove();
+          }
         }
-      }
-      return true;
 
-    } else {
-      return false;
+        return UseStatus.SUCCESS;
+
+      } else {
+        return UseStatus.INSUFFICIENT_AMOUNT;
+      }
     }
+
+    return UseStatus.ITEM_NOT_FOUND;
   }
 
   /**
