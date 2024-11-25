@@ -15,20 +15,52 @@ public class UserInterface {
   /**
    * Handles the users actions in an infinite loop, until the program is terminated.
    *
-   * @param scanner * Scanner object to take in user input.
-   * @param fridge * Fridge object as food storage reference.
+   * @param scanner  * Scanner object to take in user input.
+   * @param fridge   * Fridge object as food storage reference.
    * @param cookBook * Cookbook object with a set of saved recipes.
    */
   public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
     String input;
 
-    System.out.println("Welcome to the fridge. Write in a command below, or write \"help\" to "
-        + "check all the available commands.");
+    System.out.println("Welcome to your food registry."
+        + "\nWrite \"1\" to access the fridge. Write \"2\" to access the cookbook.");
 
-    while (true) {
-      input = ValidateInput.forceValidString(scanner);
+    int choice;
+    Boolean running = true;
+    while (running) {
+      choice = ValidateInput.forceValidInteger(scanner);
 
-      switch (input) {
+      switch (choice) {
+        case 1:
+          System.out.println("You have now entered the fridge.");
+          enteredFridge(scanner, fridge);
+
+          break;
+
+        case 2:
+          break;
+
+        default:
+          System.out.println("Invalid choice."
+              + "\nWrite \"1\" to access the fridge. Write \"2\" to access the cookbook.");
+      }
+
+    }
+
+
+
+  }
+
+  private void enteredFridge(Scanner scanner, Fridge fridge) {
+    boolean running = true;
+    String command;
+    System.out.println("You have now accessed the fridge."
+        + "Enter command, or write \"/help\" to view the available commands.");
+
+    while (running) {
+      command = ValidateInput.forceValidString(scanner);
+
+      switch (command) {
         case "/newItem":
           handleNewItem(scanner, fridge);
           break;
@@ -57,6 +89,26 @@ public class UserInterface {
           handleValue(fridge);
           break;
 
+        case "/help":
+          fridgeHelp();
+          break;
+
+        default:
+          System.out.println("Invalid command. Write \"/help\" to see all available commands.");
+      }
+    }
+  }
+
+  private void enteredCookBook(Scanner scanner, CookBook cookBook, Fridge fridge) {
+    boolean running = true;
+    String command;
+    System.out.println("You have now accessed the cookbook."
+        + " Enter a command, or write \"/help\" to view the available commands.");
+
+    while (running) {
+      command = ValidateInput.forceValidString(scanner);
+
+      switch (command) {
         case "/createRecipe":
           handleCreateRecipe(scanner, cookBook);
           break;
@@ -69,11 +121,29 @@ public class UserInterface {
           handleCheckRecipe(scanner, fridge, cookBook);
           break;
 
+        case "/printRecipe":
+          handlePrintRecipe(scanner, cookBook);
+          break;
+
+        case "/listRecipes":
+          handleListRecipes(cookBook);
+          break;
+
+        case "/deleteRecipe":
+          handleDeleteRecipe(scanner, cookBook);
+          break;
+
+        case "/help":
+          cookBookHelp();
+          break;
+
         default:
           System.out.println("Invalid command. Write \"/help\" to see all available commands.");
       }
     }
   }
+
+
 
   private void handleNewItem(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery.");
@@ -124,9 +194,9 @@ public class UserInterface {
 
     ArrayList<Grocery> result = fridge.search(groceryName);
     if (result != null) {
+      System.out.println("The item was found. Search result:");
       for (Grocery grocery : result) {
-        System.out.println("The ingredient " + grocery.getName() + " exists, you have "
-            + grocery.getAmount() + " " + grocery.getUnit() + ".");
+        System.out.println(grocery.toString());
       }
 
     } else {
@@ -135,15 +205,30 @@ public class UserInterface {
   }
 
   private void handleOverview(Fridge fridge) {
-    for (Grocery ingredient : fridge.overview()) {
-      System.out.println(
-          ingredient.getName() + ": " + ingredient.getAmount() + " "
-              + ingredient.getUnit() + ".");
+    ArrayList<Grocery> items = fridge.overview();
+    for (Grocery grocery : items) {
+      System.out.println(grocery.toString());
     }
+    System.out.println("The combined value of items in the fridge is: "
+         + fridge.calculateValue(items) + " euros.");
+
   }
 
   private void handleExpiredOverview(Fridge fridge) {
-    fridge.dateOverview();
+    ArrayList<Grocery> expiredItems = fridge.dateOverview();
+    if (!expiredItems.isEmpty()) {
+      System.out.println("These items have expired, but they may still be consumable.");
+      for (Grocery grocery : expiredItems) {
+        System.out.println(grocery.toString());
+      }
+
+      System.out.println("You may have lost up to " + fridge.calculateValue(expiredItems)
+          + " euros worth of food.");
+    } else {
+      System.out.println("You have no expired items.");
+    }
+
+
   }
 
   private void handleExpiresBefore(Scanner scanner, Fridge fridge) {
@@ -190,7 +275,7 @@ public class UserInterface {
             if (amount > 0) {
               ingredients.add(new Grocery(parts[0].trim(), parts[2].trim(), amount));
             } else {
-              System.out.println("Amount must be positive and larger than zero. Try again.");
+              System.out.println("Amount must be larger than zero. Try again.");
             }
           } catch (NumberFormatException e) {
             System.out.println("Invalid amount. Use numeric values.");
@@ -216,7 +301,7 @@ public class UserInterface {
       cookBook.createRecipe(dishName, description, instructions, ingredients, portions);
       System.out.println("Recipe saved successfully.");
     } else {
-      System.out.println("A recipe with the given name already exists.");
+      System.out.println("A recipe with the given name already exists. Aborting operation.");
     }
 
   }
@@ -279,12 +364,12 @@ public class UserInterface {
   }
 
   /**
-   * Prints out an overview of all the commands.
+   * Prints out an overview of all the fridge-related commands.
    */
-  void help() {
-    System.out.println("--------------------------------------------------------");
-    System.out.println("An overview of available commands can be seen below:");
-    System.out.println("--------------------------------------------------------");
+  void fridgeHelp() {
+    System.out.println("-----------------------------------------------------------");
+    System.out.println("An overview of available FRIDGE commands can be seen below:");
+    System.out.println("-----------------------------------------------------------");
     System.out.println("\n    - \"/newItem\" to add a new item.");
     System.out.println("    - \"/use\" to retrieve an item.");
     System.out.println(
@@ -293,6 +378,22 @@ public class UserInterface {
     System.out.println(
         "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
     System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
+  }
+
+  /**
+   * Prints out an overview of all the CookBook-related commands.
+   */
+
+  void cookBookHelp() {
+    System.out.println("--------------------------------------------------------");
+    System.out.println("An overview of available cookbook commands can be seen below:");
+    System.out.println("--------------------------------------------------------");
+    System.out.println("\n    - \"/createRecipe\" to create a new recipe.");
+    System.out.println("    - \"/availableRecipes\" to view recipes you can make with the ingredients in the fridge.");
+    System.out.println("    - \"/checkRecipe\" to check if you have enough ingredients to make a specific recipe.");
+    System.out.println("    - \"/printRecipe\" to print the details of a specific recipe.");
+    System.out.println("    - \"/listRecipes\" to list all recipes saved in the cookbook.");
+    System.out.println("    - \"/deleteRecipe\" to delete a recipe by its name.");
   }
 
 
