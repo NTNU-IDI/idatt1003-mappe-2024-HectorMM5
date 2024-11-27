@@ -70,7 +70,7 @@ public class Grocery {
   }
 
   /**
-   * Sets a new amount for an existing grocery object.
+   * Sets a new amount for an existing grocery object. Input quality ensured elsewhere.
    *
    * @param amount * Amount to be changed to.
    */
