@@ -16,7 +16,8 @@ public class Fridge {
   /**
    * Guides the user through creating a new grocery item.
    */
-  public void newGrocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
+  public static void newGrocery(String name, String unit, float amount, float cost,
+                                LocalDate expiryDate) {
     ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
   }
 
@@ -36,7 +37,7 @@ public class Fridge {
    * @param name    * Ingredient's name.
    * @param consume * Amount to be consumed.
    */
-  public UseStatus use(String name, float consume) {
+  public static UseStatus use(String name, float consume) {
 
     ArrayList<Grocery> matchingGroceries = search(name);
 
@@ -50,19 +51,20 @@ public class Fridge {
           .map(Grocery::getAmount)
           .reduce(0f, Float::sum);
 
-      if (totalAmount > consume) {
+      if (totalAmount >= consume) {
         Iterator<Grocery> iterator = matchingGroceries.iterator();
 
         while (consume > 0) {
           Grocery grocery = iterator.next();
           if (grocery.getAmount() > consume) {
             grocery.setAmount(grocery.getAmount() - consume);
+            consume = 0;
           } else {
             consume -= grocery.getAmount();
             grocery.setAmount(0);
-            iterator.remove();
           }
         }
+        ingredients.removeIf(grocery -> grocery.getAmount() == 0);
 
         return UseStatus.SUCCESS;
 
@@ -80,7 +82,7 @@ public class Fridge {
    * @param name * Ingredient's name.
    * @return List of matching Grocery objects.
    */
-  public ArrayList<Grocery> search(String name) {
+  public static ArrayList<Grocery> search(String name) {
     return ingredients.stream()
         .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -91,7 +93,7 @@ public class Fridge {
    *
    * @return A new sorted list of all ingredients.
    */
-  public ArrayList<Grocery> overview() {
+  public static ArrayList<Grocery> overview() {
     return ingredients.stream()
         .sorted(Comparator.comparing(Grocery::getName))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -102,7 +104,7 @@ public class Fridge {
    *
    * @return A new list of all expired ingredients.
    */
-  public ArrayList<Grocery> dateOverview() {
+  public static ArrayList<Grocery> dateOverview() {
     return ingredients.stream()
         .sorted(Comparator.comparing(Grocery::getName))
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
@@ -115,7 +117,7 @@ public class Fridge {
    * @param groceries The list of groceries to calculate the value for.
    * @return The total value of the groceries as an integer.
    */
-  public int calculateValue(ArrayList<Grocery> groceries) {
+  public static int calculateValue(ArrayList<Grocery> groceries) {
     float sum = 0;
     for (Grocery grocery : groceries) {
       sum += grocery.getAmount() * grocery.getCost();
@@ -124,11 +126,12 @@ public class Fridge {
   }
 
   /**
-   * Prints a list of items that will expire before a given date.
+   * Returns ArrayList of items that will expire before a given date.
    *
    * @param date The date to compare against.
+   * @return * ArrayList with Grocery objects
    */
-  public ArrayList<Grocery> expiresBefore(LocalDate date) {
+  public static ArrayList<Grocery> expiresBefore(LocalDate date) {
     return ingredients.stream()
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(date))
         .collect(Collectors.toCollection(ArrayList::new));
