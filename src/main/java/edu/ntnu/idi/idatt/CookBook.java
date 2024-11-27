@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +60,21 @@ public class CookBook {
 
     return availableRecipes;
 
+  }
+
+  public Boolean deleteRecipe(String name) {
+    Iterator<Recipe> iterator = getRecipes().iterator();
+    boolean found = false;
+
+    while (!found && iterator.hasNext()) {
+      Recipe recipe = iterator.next();
+      if (recipe.getName().equalsIgnoreCase(name)) {
+        iterator.remove();
+        found = true;
+      }
+    }
+
+    return found;
   }
 
   /**

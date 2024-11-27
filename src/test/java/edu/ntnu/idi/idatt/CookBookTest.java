@@ -49,17 +49,17 @@ class CookBookTest {
     ingredients.add(new Grocery("Salt", "g", 10.0f));
 
     Recipe pastaRecipe = new Recipe("Pasta", "Simple pasta recipe", instructions, ingredients, 2);
-    cookBook.recipeList.add(pastaRecipe);
+    CookBook.recipeList.add(pastaRecipe);
 
     // Add ingredients to the fridge to satisfy the recipe
-    fridge.ingredients.add(new Grocery("Pasta", "g", 250.0f));
-    fridge.ingredients.add(new Grocery("Salt", "g", 20.0f));
+    Fridge.ingredients.add(new Grocery("Pasta", "g", 250.0f));
+    Fridge.ingredients.add(new Grocery("Salt", "g", 20.0f));
 
     // Check if the recipe is available
     cookBook.recipeAvailability(fridge);
 
     // We should have one recipe available that can be made with the current ingredients
-    assertTrue(cookBook.recipeList.contains(pastaRecipe));
+    assertTrue(CookBook.recipeList.contains(pastaRecipe));
   }
 
   @Test

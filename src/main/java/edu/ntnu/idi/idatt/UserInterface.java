@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 /**
@@ -22,11 +23,13 @@ public class UserInterface {
   public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
     String input;
 
-    System.out.println("Welcome to your food registry."
-        + "\nWrite \"1\" to access the fridge. Write \"2\" to access the cookbook.");
+    System.out.println("Welcome to your food registry:"
+        + "\nWrite \"1\" to access the fridge."
+        + "\nWrite \"2\" to access the cookbook."
+        + "\nWrite \"3\" to terminate the program.");
 
     int choice;
-    Boolean running = true;
+    boolean running = true;
     while (running) {
       choice = ValidateInput.forceValidInteger(scanner);
 
@@ -34,23 +37,27 @@ public class UserInterface {
         case 1:
           System.out.println("You have now entered the fridge.");
           enteredFridge(scanner, fridge);
-
           break;
 
         case 2:
+          System.out.println("You have now entered the cookbook.");
+          enteredCookBook(scanner, cookBook, fridge);
+          break;
+
+        case 3:
+          System.out.println("You have now terminated the program.");
+          running = false;
           break;
 
         default:
-          System.out.println("Invalid choice."
-              + "\nWrite \"1\" to access the fridge. Write \"2\" to access the cookbook.");
+          System.out.println("Invalid choice.");
       }
-
     }
-
-
-
   }
 
+  //
+  //FRIDGE SECTION
+  //
   private void enteredFridge(Scanner scanner, Fridge fridge) {
     boolean running = true;
     String command;
@@ -93,51 +100,8 @@ public class UserInterface {
           fridgeHelp();
           break;
 
-        default:
-          System.out.println("Invalid command. Write \"/help\" to see all available commands.");
-      }
-    }
-  }
-
-  private void enteredCookBook(Scanner scanner, CookBook cookBook, Fridge fridge) {
-    boolean running = true;
-    String command;
-    System.out.println("You have now accessed the cookbook."
-        + " Enter a command, or write \"/help\" to view the available commands.");
-
-    while (running) {
-      command = ValidateInput.forceValidString(scanner);
-
-      switch (command) {
-        case "/createRecipe":
-          handleCreateRecipe(scanner, cookBook);
-          break;
-
-        case "/availableRecipes":
-          handleAvailableRecipes(cookBook, fridge);
-          break;
-
-        case "/checkRecipe":
-          handleCheckRecipe(scanner, fridge, cookBook);
-          break;
-
-        case "/printRecipe":
-          handlePrintRecipe(scanner, cookBook);
-          break;
-
-        case "/listRecipes":
-          handleAllRecipes(cookBook);
-          break;
-
-        case "/deleteRecipe":
-          handleDeleteRecipe(scanner, cookBook);
-          break;
-
-        case "/help":
-          cookBookHelp();
-          break;
-
         case "/back":
+          System.out.println("Exited cookbook.");
           running = false;
           break;
 
@@ -146,8 +110,6 @@ public class UserInterface {
       }
     }
   }
-
-
 
   private void handleNewItem(Scanner scanner, Fridge fridge) {
     System.out.println("Write the name of the grocery.");
@@ -214,7 +176,7 @@ public class UserInterface {
       System.out.println(grocery.toString());
     }
     System.out.println("The combined value of items in the fridge is: "
-         + fridge.calculateValue(items) + " euros.");
+        + fridge.calculateValue(items) + " euros.");
 
   }
 
@@ -252,6 +214,71 @@ public class UserInterface {
   private void handleValue(Fridge fridge) {
     fridge.calculateValue(Fridge.ingredients);
   }
+
+  //
+  //COOKBOOK SECTION
+  //
+  private void enteredCookBook(Scanner scanner, CookBook cookBook, Fridge fridge) {
+    boolean running = true;
+    String command;
+    System.out.println("You have now accessed the cookbook."
+        + " Enter a command, or write \"/help\" to view the available commands.");
+
+    while (running) {
+      command = ValidateInput.forceValidString(scanner);
+
+      switch (command) {
+        case "/createRecipe":
+          handleCreateRecipe(scanner, cookBook);
+          break;
+
+        case "/availableRecipes":
+          handleAvailableRecipes(cookBook, fridge);
+          break;
+
+        case "/checkRecipe":
+          handleCheckRecipe(scanner, fridge, cookBook);
+          break;
+
+        case "/printRecipe":
+          handlePrintRecipe(scanner, cookBook);
+          break;
+
+        case "/listRecipes":
+          handleAllRecipes(cookBook);
+          break;
+
+        case "/deleteRecipe":
+          handleDeleteRecipe(scanner, cookBook);
+          break;
+
+        case "/help":
+          cookBookHelp();
+          break;
+
+        case "/back":
+          System.out.println("Exited cookbook.");
+          running = false;
+          break;
+
+        default:
+          System.out.println("Invalid command. Write \"/help\" to see all available commands.");
+      }
+    }
+  }
+
+  private void handleDeleteRecipe(Scanner scanner, CookBook cookBook) {
+    System.out.println("Write the name of the recipe you want to delete");
+    String choiceName = ValidateInput.forceValidString(scanner);
+
+    //If returns true (meaning successful search and deletion):
+    if (cookBook.deleteRecipe(choiceName)) {
+      System.out.println("Recipe deleted.");
+    } else {
+      System.out.println("A recipe with the given name was not found.");
+    }
+  }
+
 
   private void handleCreateRecipe(Scanner scanner, CookBook cookBook) {
     System.out.println("Now creating a new recipe.");
@@ -404,9 +431,4 @@ public class UserInterface {
     System.out.println("    - \"/listRecipes\" to list all recipes saved in the cookbook.");
     System.out.println("    - \"/deleteRecipe\" to delete a recipe by its name.");
   }
-
-
 }
-
-
-
