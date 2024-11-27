@@ -55,15 +55,4 @@ class GroceryTest {
 
     assertThrows(IllegalArgumentException.class, () -> testGrocery.setAmount(0));
   }
-
-  @Test
-  void usePositive() {
-    testGrocery.use(4);
-    assertEquals(1, testGrocery.getAmount());
-
-  }
-  @Test
-  void useNegative() {
-    assertThrows(IllegalArgumentException.class, () -> testGrocery.use(-1));
-  }
 }

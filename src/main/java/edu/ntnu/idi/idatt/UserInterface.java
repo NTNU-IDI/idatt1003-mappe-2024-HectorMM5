@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
 
 /**
@@ -17,10 +16,8 @@ public class UserInterface {
    * Handles the users actions in an infinite loop, until the program is terminated.
    *
    * @param scanner  * Scanner object to take in user input.
-   * @param fridge   * Fridge object as food storage reference.
-   * @param cookBook * Cookbook object with a set of saved recipes.
    */
-  public void start(Scanner scanner, Fridge fridge, CookBook cookBook) {
+  public void start(Scanner scanner) {
     String input;
 
     System.out.println("Welcome to your food registry:"
@@ -36,12 +33,12 @@ public class UserInterface {
       switch (choice) {
         case 1:
           System.out.println("You have now entered the fridge.");
-          enteredFridge(scanner, fridge);
+          enteredFridge(scanner);
           break;
 
         case 2:
           System.out.println("You have now entered the cookbook.");
-          enteredCookBook(scanner, cookBook, fridge);
+          enteredCookBook(scanner);
           break;
 
         case 3:
@@ -58,7 +55,7 @@ public class UserInterface {
   //
   //FRIDGE SECTION
   //
-  private void enteredFridge(Scanner scanner, Fridge fridge) {
+  private void enteredFridge(Scanner scanner) {
     boolean running = true;
     String command;
     System.out.println("You have now accessed the fridge."
@@ -69,31 +66,31 @@ public class UserInterface {
 
       switch (command) {
         case "/newItem":
-          handleNewItem(scanner, fridge);
+          handleNewItem(scanner);
           break;
 
         case "/use":
-          handleUse(scanner, fridge);
+          handleUse(scanner);
           break;
 
         case "/search":
-          handleSearch(scanner, fridge);
+          handleSearch(scanner);
           break;
 
         case "/overview":
-          handleOverview(fridge);
+          handleOverview();
           break;
 
         case "/expiredOverview":
-          handleExpiredOverview(fridge);
+          handleExpiredOverview();
           break;
 
         case "/expiresBefore":
-          handleExpiresBefore(scanner, fridge);
+          handleExpiresBefore(scanner);
           break;
 
         case "/value":
-          handleValue(fridge);
+          handleValue();
           break;
 
         case "/help":
@@ -111,7 +108,7 @@ public class UserInterface {
     }
   }
 
-  private void handleNewItem(Scanner scanner, Fridge fridge) {
+  private void handleNewItem(Scanner scanner) {
     System.out.println("Write the name of the grocery.");
     final String name = ValidateInput.forceValidString(scanner);
 
@@ -137,10 +134,10 @@ public class UserInterface {
       }
     }
 
-    fridge.newGrocery(name, unit, amount, cost, expiryDate);
+    Fridge.newGrocery(name, unit, amount, cost, expiryDate);
   }
 
-  private void handleUse(Scanner scanner, Fridge fridge) {
+  private void handleUse(Scanner scanner) {
     System.out.println("Write the name of the grocery you want to use:");
     String groceryName = ValidateInput.forceValidString(scanner);
 
@@ -148,17 +145,17 @@ public class UserInterface {
     float consume = ValidateInput.forceValidFloat(scanner);
 
     try {
-      fridge.use(groceryName, consume);
+      Fridge.use(groceryName, consume);
     } catch (Exception e) {
       System.out.println("The item was either not found, or you do not have enough of it.");
     }
   }
 
-  private void handleSearch(Scanner scanner, Fridge fridge) {
+  private void handleSearch(Scanner scanner) {
     System.out.println("Write the name of the grocery:");
     String groceryName = ValidateInput.forceValidString(scanner);
 
-    ArrayList<Grocery> result = fridge.search(groceryName);
+    ArrayList<Grocery> result = Fridge.search(groceryName);
     if (result != null) {
       System.out.println("The item was found. Search result:");
       for (Grocery grocery : result) {
@@ -170,25 +167,25 @@ public class UserInterface {
     }
   }
 
-  private void handleOverview(Fridge fridge) {
-    ArrayList<Grocery> items = fridge.overview();
+  private void handleOverview() {
+    ArrayList<Grocery> items = Fridge.overview();
     for (Grocery grocery : items) {
       System.out.println(grocery.toString());
     }
     System.out.println("The combined value of items in the fridge is: "
-        + fridge.calculateValue(items) + " euros.");
+        + Fridge.calculateValue(items) + " euros.");
 
   }
 
-  private void handleExpiredOverview(Fridge fridge) {
-    ArrayList<Grocery> expiredItems = fridge.dateOverview();
+  private void handleExpiredOverview() {
+    ArrayList<Grocery> expiredItems = Fridge.dateOverview();
     if (!expiredItems.isEmpty()) {
       System.out.println("These items have expired, but they may still be consumable.");
       for (Grocery grocery : expiredItems) {
         System.out.println(grocery.toString());
       }
 
-      System.out.println("You may have lost up to " + fridge.calculateValue(expiredItems)
+      System.out.println("You may have lost up to " + Fridge.calculateValue(expiredItems)
           + " euros worth of food.");
     } else {
       System.out.println("You have no expired items.");
@@ -197,7 +194,7 @@ public class UserInterface {
 
   }
 
-  private void handleExpiresBefore(Scanner scanner, Fridge fridge) {
+  private void handleExpiresBefore(Scanner scanner) {
     System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
     LocalDate expiryDate;
     while (true) {
@@ -208,17 +205,17 @@ public class UserInterface {
         System.out.println("Invalid input, please enter the date in the format DDMMYYYY:");
       }
     }
-    fridge.expiresBefore(expiryDate);
+    Fridge.expiresBefore(expiryDate);
   }
 
-  private void handleValue(Fridge fridge) {
-    fridge.calculateValue(Fridge.ingredients);
+  private void handleValue() {
+    Fridge.calculateValue(Fridge.ingredients);
   }
 
   //
   //COOKBOOK SECTION
   //
-  private void enteredCookBook(Scanner scanner, CookBook cookBook, Fridge fridge) {
+  private void enteredCookBook(Scanner scanner) {
     boolean running = true;
     String command;
     System.out.println("You have now accessed the cookbook."
@@ -229,27 +226,27 @@ public class UserInterface {
 
       switch (command) {
         case "/createRecipe":
-          handleCreateRecipe(scanner, cookBook);
+          handleCreateRecipe(scanner);
           break;
 
         case "/availableRecipes":
-          handleAvailableRecipes(cookBook, fridge);
+          handleAvailableRecipes();
           break;
 
         case "/checkRecipe":
-          handleCheckRecipe(scanner, fridge, cookBook);
+          handleCheckRecipe(scanner);
           break;
 
         case "/printRecipe":
-          handlePrintRecipe(scanner, cookBook);
+          handlePrintRecipe(scanner);
           break;
 
         case "/listRecipes":
-          handleAllRecipes(cookBook);
+          handleAllRecipes();
           break;
 
         case "/deleteRecipe":
-          handleDeleteRecipe(scanner, cookBook);
+          handleDeleteRecipe(scanner);
           break;
 
         case "/help":
@@ -267,12 +264,12 @@ public class UserInterface {
     }
   }
 
-  private void handleDeleteRecipe(Scanner scanner, CookBook cookBook) {
+  private void handleDeleteRecipe(Scanner scanner) {
     System.out.println("Write the name of the recipe you want to delete");
     String choiceName = ValidateInput.forceValidString(scanner);
 
     //If returns true (meaning successful search and deletion):
-    if (cookBook.deleteRecipe(choiceName)) {
+    if (CookBook.deleteRecipe(choiceName)) {
       System.out.println("Recipe deleted.");
     } else {
       System.out.println("A recipe with the given name was not found.");
@@ -280,14 +277,14 @@ public class UserInterface {
   }
 
 
-  private void handleCreateRecipe(Scanner scanner, CookBook cookBook) {
+  private void handleCreateRecipe(Scanner scanner) {
     System.out.println("Now creating a new recipe.");
 
     System.out.println("Write the name of the dish:");
     final String dishName = ValidateInput.forceValidString(scanner);
 
     //If no dish with this name already exists:
-    if (cookBook.search(dishName) == null) {
+    if (CookBook.search(dishName) == null) {
       System.out.println("Write a short description of the dish:");
       final String description = ValidateInput.forceValidString(scanner);
 
@@ -329,7 +326,7 @@ public class UserInterface {
       System.out.println("How many portions does this make?");
       int portions = ValidateInput.forceValidInteger(scanner);
 
-      cookBook.createRecipe(dishName, description, instructions, ingredients, portions);
+      CookBook.createRecipe(dishName, description, instructions, ingredients, portions);
       System.out.println("Recipe saved successfully.");
     } else {
       System.out.println("A recipe with the given name already exists. Aborting operation.");
@@ -338,21 +335,21 @@ public class UserInterface {
   }
 
 
-  void handleAvailableRecipes(CookBook cookBook, Fridge fridge) {
+  void handleAvailableRecipes() {
     System.out.println("With the ingredients you have, you are able to make:");
-    for (Recipe recipe : cookBook.recipeAvailability(fridge)) {
+    for (Recipe recipe : CookBook.recipeAvailability()) {
       System.out.println("  - " + recipe.getName());
     }
   }
 
-  void handleCheckRecipe(Scanner scanner, Fridge fridge, CookBook cookBook) {
+  void handleCheckRecipe(Scanner scanner) {
     System.out.println("What recipe do you want to check?");
     String choice = ValidateInput.forceValidString(scanner);
 
-    Recipe chosenRecipe = cookBook.search(choice);
+    Recipe chosenRecipe = CookBook.search(choice);
 
     if (chosenRecipe != null) {
-      Boolean found = cookBook.recipeCheck(chosenRecipe, fridge);
+      Boolean found = CookBook.recipeCheck(chosenRecipe);
 
       if (found) {
         System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
@@ -365,10 +362,10 @@ public class UserInterface {
     }
   }
 
-  void handlePrintRecipe(Scanner scanner, CookBook cookBook) {
+  void handlePrintRecipe(Scanner scanner) {
     System.out.println("What recipe do you want to print?");
     String choice = ValidateInput.forceValidString(scanner);
-    Recipe recipe = cookBook.search(choice);
+    Recipe recipe = CookBook.search(choice);
     if (recipe == null) {
       System.out.println("Recipe " + choice + " was not found.");
     } else {
@@ -392,8 +389,8 @@ public class UserInterface {
     }
   }
 
-  void handleAllRecipes(CookBook cookBook) {
-    for (Recipe recipe : cookBook.getRecipes()) {
+  void handleAllRecipes() {
+    for (Recipe recipe : CookBook.getRecipes()) {
       System.out.println(recipe.getName() + " - " + recipe.getPortions() + " portions");
     }
   }

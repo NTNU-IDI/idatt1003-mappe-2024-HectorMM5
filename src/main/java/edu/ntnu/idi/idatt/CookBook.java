@@ -19,7 +19,7 @@ public class CookBook {
    * @param name * recipe/dish's name
    * @return * Dish object, if found. Otherwise, return null.
    */
-  public Recipe search(String name) {
+  public static Recipe search(String name) {
     return recipeList.stream()
         .filter(recipe -> recipe.getName().equalsIgnoreCase(name))
         .findFirst()
@@ -30,7 +30,7 @@ public class CookBook {
   /**
    * Guides the user through the creation of a recipe.
    */
-  public void createRecipe(String name, String description, ArrayList<String> instructions,
+  public static void createRecipe(String name, String description, ArrayList<String> instructions,
                            ArrayList<Grocery> food, int portions) {
     recipeList.add(new Recipe(name, description, instructions, food, portions));
   }
@@ -38,7 +38,7 @@ public class CookBook {
   /**
    * Returns an ArrayList of all the created recipes.
    */
-  public ArrayList<Recipe> getRecipes() {
+  public static ArrayList<Recipe> getRecipes() {
     return recipeList.stream()
         .sorted(Comparator.comparing(Recipe::getName))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -47,13 +47,13 @@ public class CookBook {
   /**
    * Shows which recipes are available with the current groceries stored in the fridge.
    */
-  public ArrayList<Recipe> recipeAvailability(Fridge fridge) {
+  public static ArrayList<Recipe> recipeAvailability() {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
     for (Recipe recipe : recipeList) {
       //If returned boolean is true
-      if (recipeCheck(recipe, fridge)) {
+      if (recipeCheck(recipe)) {
         availableRecipes.add(recipe);
       }
     }
@@ -62,8 +62,15 @@ public class CookBook {
 
   }
 
-  public Boolean deleteRecipe(String name) {
-    Iterator<Recipe> iterator = getRecipes().iterator();
+  /**
+   * Searches for and deletes the recipe with the given name.
+   *
+   * @param name * Recipe's name
+   * @return * BOOLEAN: true if found and deleted, false if not found.
+   */
+
+  public static Boolean deleteRecipe(String name) {
+    Iterator<Recipe> iterator = recipeList.iterator();
     boolean found = false;
 
     while (!found && iterator.hasNext()) {
@@ -82,13 +89,13 @@ public class CookBook {
    *
    * @param recipe * The recipe in question.
    */
-  public Boolean recipeCheck(Recipe recipe, Fridge fridge) {
+  public static Boolean recipeCheck(Recipe recipe) {
     //ChatGPT
     return recipe.getFoods().stream()
         //All instances of food (all Grocery objects within recipe) must match the condition.
         .allMatch(food -> {
           // Use the search method to get all groceries with the same name
-          ArrayList<Grocery> matchingGroceries = fridge.search(food.getName());
+          ArrayList<Grocery> matchingGroceries = Fridge.search(food.getName());
 
           // Calculate the quantity of matching groceries
           float totalAmount = matchingGroceries.stream()

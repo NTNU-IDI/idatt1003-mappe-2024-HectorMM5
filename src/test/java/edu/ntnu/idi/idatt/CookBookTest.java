@@ -10,13 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CookBookTest {
 
-  private CookBook cookBook;
-  private Fridge fridge;
+
 
   @BeforeEach
   void setUp() {
-    cookBook = new CookBook();
-    fridge = new Fridge();
+
   }
 
   @Test
@@ -29,15 +27,14 @@ class CookBookTest {
     ArrayList<Grocery> ingredients = new ArrayList<>();
     ingredients.add(new Grocery("Tomato", "kg", 1.0f));
 
-    Recipe recipe = new Recipe("Tomato Soup", "A simple tomato soup.", instructions, ingredients, 2);
-    cookBook.recipeList.add(recipe);
+    CookBook.createRecipe("Tomato Soup", "A simple tomato soup.", instructions, ingredients, 2);
 
     // Capture output for the viewRecipes method
-    cookBook.viewRecipes();
+    CookBook.getRecipes();
 
     // Check if the recipe has been correctly added to the cookbook
-    assertEquals(1, cookBook.recipeList.size());
-    assertEquals("Tomato Soup", cookBook.recipeList.get(0).getName());
+    assertEquals(1, CookBook.recipeList.size());
+    assertEquals("Tomato Soup", CookBook.recipeList.get(0).getName());
   }
 
   @Test
@@ -56,7 +53,7 @@ class CookBookTest {
     Fridge.ingredients.add(new Grocery("Salt", "g", 20.0f));
 
     // Check if the recipe is available
-    cookBook.recipeAvailability(fridge);
+    CookBook.recipeAvailability();
 
     // We should have one recipe available that can be made with the current ingredients
     assertTrue(CookBook.recipeList.contains(pastaRecipe));
@@ -71,15 +68,15 @@ class CookBookTest {
     ingredients.add(new Grocery("Sugar", "g", 100.0f));
 
     Recipe cakeRecipe = new Recipe("Cake", "Simple cake recipe", instructions, ingredients, 4);
-    cookBook.recipeList.add(cakeRecipe);
+    CookBook.recipeList.add(cakeRecipe);
 
     // Add insufficient ingredients to the fridge
-    fridge.ingredients.add(new Grocery("Flour", "g", 200.0f));
-    fridge.ingredients.add(new Grocery("Sugar", "g", 50.0f));
+    Fridge.ingredients.add(new Grocery("Flour", "g", 200.0f));
+    Fridge.ingredients.add(new Grocery("Sugar", "g", 50.0f));
 
 
     // The recipe should not be available since we don't have enough ingredients
 
-    assertFalse(cookBook.recipeAvailability(fridge).contains(cakeRecipe));
+    assertFalse(CookBook.recipeAvailability().contains(cakeRecipe));
   }
 }
