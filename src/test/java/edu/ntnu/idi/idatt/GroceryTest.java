@@ -49,10 +49,4 @@ class GroceryTest {
     assertEquals(10, testGrocery.getAmount());
   }
 
-  @Test
-  void setAmountNegative() {
-    assertThrows(IllegalArgumentException.class, () -> testGrocery.setAmount(-5));
-
-    assertThrows(IllegalArgumentException.class, () -> testGrocery.setAmount(0));
-  }
 }

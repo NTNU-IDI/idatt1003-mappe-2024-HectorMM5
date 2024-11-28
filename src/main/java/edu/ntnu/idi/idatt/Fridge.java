@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
  */
 public class Fridge {
 
-  static final ArrayList<Grocery> ingredients = new ArrayList<>();
+  private static final ArrayList<Grocery> ingredients = new ArrayList<>();
+
+
 
   /**
    * Guides the user through creating a new grocery item.
@@ -136,5 +138,4 @@ public class Fridge {
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(date))
         .collect(Collectors.toCollection(ArrayList::new));
   }
-
 }

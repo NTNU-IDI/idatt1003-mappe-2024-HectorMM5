@@ -18,7 +18,6 @@ public class UserInterface {
    * @param scanner  * Scanner object to take in user input.
    */
   public void start(Scanner scanner) {
-    String input;
 
     System.out.println("Welcome to your food registry:"
         + "\nWrite \"1\" to access the fridge."
@@ -209,7 +208,7 @@ public class UserInterface {
   }
 
   private void handleValue() {
-    Fridge.calculateValue(Fridge.ingredients);
+    Fridge.calculateValue(Fridge.overview());
   }
 
   //
@@ -349,7 +348,7 @@ public class UserInterface {
     Recipe chosenRecipe = CookBook.search(choice);
 
     if (chosenRecipe != null) {
-      Boolean found = CookBook.recipeCheck(chosenRecipe);
+      boolean found = CookBook.recipeCheck(chosenRecipe);
 
       if (found) {
         System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
@@ -422,8 +421,10 @@ public class UserInterface {
     System.out.println("An overview of available cookbook commands can be seen below:");
     System.out.println("--------------------------------------------------------");
     System.out.println("\n    - \"/createRecipe\" to create a new recipe.");
-    System.out.println("    - \"/availableRecipes\" to view recipes you can make with the ingredients in the fridge.");
-    System.out.println("    - \"/checkRecipe\" to check if you have enough ingredients to make a specific recipe.");
+    System.out.println("    - \"/availableRecipes\" to view recipes you can make with the "
+        + "ingredients in the fridge.");
+    System.out.println("    - \"/checkRecipe\" to check if you have enough ingredients to"
+        + " make a specific recipe.");
     System.out.println("    - \"/printRecipe\" to print the details of a specific recipe.");
     System.out.println("    - \"/listRecipes\" to list all recipes saved in the cookbook.");
     System.out.println("    - \"/deleteRecipe\" to delete a recipe by its name.");
