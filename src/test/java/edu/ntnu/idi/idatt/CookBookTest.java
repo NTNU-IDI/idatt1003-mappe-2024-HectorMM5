@@ -1,22 +1,25 @@
 package edu.ntnu.idi.idatt;
 
-import java.lang.reflect.Array;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CookBookTest {
 
-
-
   @BeforeEach
   void setUp() {
-    CookBook.recipeList.clear();
-    Fridge.ingredients.clear();
+    // Resets the lists
+    for (Recipe recipe : CookBook.getRecipes()) {
+      CookBook.deleteRecipe(recipe.getName());
+    }
+
+    for (Grocery grocery : Fridge.overview()) {
+      Fridge.use(grocery.getName(), grocery.getAmount());
+    }
 
     ArrayList<String> instructions = new ArrayList<>();
     instructions.add("Step 1");
@@ -26,13 +29,11 @@ class CookBookTest {
     ArrayList<Grocery> ingredients = new ArrayList<>();
     ingredients.add(new Grocery("Tomato", "kg", 1.0f));
 
-    CookBook.recipeList.add(new Recipe("Tomato Soup", "A simple tomato soup.", instructions, ingredients, 2));
-
+    CookBook.createRecipe("Tomato Soup", "A simple tomato soup.", instructions, ingredients, 2);
   }
 
   @Test
   void createRecipe() {
-
     ArrayList<String> instructions = new ArrayList<>();
     instructions.add("Step 1");
     instructions.add("Step 2");
@@ -44,8 +45,9 @@ class CookBookTest {
     CookBook.createRecipe("Shredded carrots", "Carrots but shredded.", instructions, ingredients, 2);
 
     // Check if the recipe has been correctly added to the cookbook
-    assertEquals(2, CookBook.recipeList.size());
-    assertEquals("Shredded carrots", CookBook.recipeList.get(1).getName());
+    // Remember alphabetical order
+    assertEquals(2, CookBook.getRecipes().size());
+    assertEquals("Shredded carrots", CookBook.getRecipes().get(0).getName());
   }
 
   @Test
@@ -61,15 +63,15 @@ class CookBookTest {
 
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
 
-    //Adding enough tomatoes for the default "Tomato soup" recipe
-    Fridge.ingredients.add(new Grocery("Tomato", "kg", 3.0f));
+    // Adding enough tomatoes for the default "Tomato soup" recipe
+    Fridge.newGrocery("Tomato", "kg", 3.0f, 10, LocalDate.of(2025, 1, 1));
 
+    //Since only Tomato soup has the necessary ingredients, only it should pass
     ArrayList<Recipe> recipes = CookBook.getRecipes();
-    //Pasta recipe
+    // Pasta recipe
     assertFalse(CookBook.recipeCheck(recipes.get(0)));
-    //Tomato soup
+    // Tomato soup
     assertTrue(CookBook.recipeCheck(recipes.get(1)));
-
   }
 
   @Test
@@ -83,18 +85,16 @@ class CookBookTest {
     ingredients.add(new Grocery("Pasta", "g", 200.0f));
     ingredients.add(new Grocery("Salt", "g", 10.0f));
 
-    //Created new recipe, to differentiate
+    // Create new recipe to differentiate
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
 
-    //Deletes default recipe Tomato soup
-    CookBook.deleteRecipe("Tomato soup");
+    // Deletes default recipe Tomato soup
+    CookBook.deleteRecipe("Tomato Soup");
 
-    //If successful deletion, the following is true:
+    // If successful deletion, the following is true:
     assertEquals(1, CookBook.getRecipes().size());
     assertEquals("Pasta", CookBook.getRecipes().get(0).getName());
   }
-
-
 
   @Test
   void recipeAvailability() {
@@ -107,31 +107,37 @@ class CookBookTest {
     ingredients.add(new Grocery("Pasta", "g", 200.0f));
     ingredients.add(new Grocery("Salt", "g", 10.0f));
 
-    //Two recipes to ensure both are returned
-    //A third to ensure it gets filtered away
+    // Two recipes to ensure both are returned
+    // A third to ensure it gets filtered away
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
-    CookBook.createRecipe("Simpler pasta", "Even simpler pasta recipe", instructions, ingredients, 2);
+    CookBook.createRecipe("Simpler pasta", "Even simpler pasta recipe.", instructions, ingredients, 2);
 
     ArrayList<Grocery> fake = new ArrayList<>();
     fake.add(new Grocery("Fake", "g", 1));
 
-    CookBook.createRecipe("Z", "Fake pasta recipe", instructions, fake, 2);
+    CookBook.createRecipe("Z", "Fake pasta recipe.", instructions, fake, 2);
 
-    // Store ingredients needed to make the recipe.
-    Fridge.ingredients.add(new Grocery("Pasta", "g", 250.0f));
-    Fridge.ingredients.add(new Grocery("Salt", "g", 20.0f));
+    // Store ingredients needed to make the recipe
+    Fridge.newGrocery("Pasta", "g", 250.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Salt", "g", 20.0f, 10, LocalDate.of(2025, 1, 1));
 
     ArrayList<Recipe> recipes = CookBook.getRecipes();
     ArrayList<Recipe> availableRecipes = CookBook.recipeAvailability();
 
-
+    // Pasta, ingredients were added so the recipe should appear
     assertTrue(availableRecipes.contains(recipes.get(0)));
+
+    // Simpler pasta, should appear
     assertTrue(availableRecipes.contains(recipes.get(1)));
-    //Remember alphabetical order
+
+    //Tomato soup, should NOT appear
     assertFalse(availableRecipes.contains(recipes.get(2)));
 
-    assertEquals(2, availableRecipes.size());
+    // Due to alphabetical order, this last element will be "Z".
+    // It should not be in the given ArrayList
+    assertFalse(availableRecipes.contains(recipes.get(3)));
 
+    assertEquals(2, availableRecipes.size());
   }
 
   @Test
@@ -145,13 +151,10 @@ class CookBookTest {
     ingredients.add(new Grocery("Pasta", "g", 200.0f));
     ingredients.add(new Grocery("Salt", "g", 10.0f));
 
-    //Making an object, to then search and compare it
-    Recipe pastaRecipe = new Recipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
+    // Make an object, then search and compare it
+    CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
 
-    CookBook.recipeList.add(pastaRecipe);
-
-    //If search function is successful, a reference to pastaRecipe will be created:
-    assertSame(CookBook.search("Pasta"), pastaRecipe);
-
+    // If search function is successful, a reference to pastaRecipe will be created
+    assertSame(CookBook.search("Pasta"), CookBook.getRecipes().get(0));
   }
 }

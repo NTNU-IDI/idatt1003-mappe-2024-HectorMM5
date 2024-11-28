@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * Saves individual dishes with their respective names, ingredients, descriptions and instructions.
  */
 public class CookBook {
-  static final ArrayList<Recipe> recipeList = new ArrayList<>();
+  private static final ArrayList<Recipe> recipeList = new ArrayList<>();
 
   /**
    * Searches for and returns a recipe-object with the given name.
@@ -110,5 +110,26 @@ public class CookBook {
           // Check if the total amount is sufficient
           return totalAmount >= food.getAmount(); //If true, this food object is approved.
         });
+  }
+
+  /**
+   * Consumes all the items given in a recipe, to avoid running the command for each by hand.
+   *
+   * @param recipe the recipe to be cooked
+   * @return boolean, true if recipe was possible to make and was cooked
+   */
+  public static boolean cookRecipe(Recipe recipe) {
+
+    if (recipeCheck(recipe)) {
+      for (Grocery grocery : recipe.getFoods()) {
+        Fridge.use(grocery.getName(), grocery.getAmount());
+
+      }
+
+      return true;
+
+    } else {
+      return false;
+    }
   }
 }
