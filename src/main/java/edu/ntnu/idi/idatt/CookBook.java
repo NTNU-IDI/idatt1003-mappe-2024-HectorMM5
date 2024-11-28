@@ -36,7 +36,9 @@ public class CookBook {
   }
 
   /**
-   * Returns an ArrayList of all the created recipes.
+   * Returns a sorted ArrayList of all the created recipes.
+   *
+   * @return ArrayList with recipe objects.
    */
   public static ArrayList<Recipe> getRecipes() {
     return recipeList.stream()
@@ -46,12 +48,14 @@ public class CookBook {
 
   /**
    * Shows which recipes are available with the current groceries stored in the fridge.
+   *
+   * @return ArrayList with recipe objects.
    */
   public static ArrayList<Recipe> recipeAvailability() {
 
     ArrayList<Recipe> availableRecipes = new ArrayList<>();
 
-    for (Recipe recipe : recipeList) {
+    for (Recipe recipe : getRecipes()) {
       //If returned boolean is true
       if (recipeCheck(recipe)) {
         availableRecipes.add(recipe);
@@ -65,11 +69,11 @@ public class CookBook {
   /**
    * Searches for and deletes the recipe with the given name.
    *
-   * @param name * Recipe's name
-   * @return * BOOLEAN: true if found and deleted, false if not found.
+   * @param name Recipe's name
+   * @return BOOLEAN: true if found and deleted, false if not found.
    */
 
-  public static Boolean deleteRecipe(String name) {
+  public static boolean deleteRecipe(String name) {
     Iterator<Recipe> iterator = recipeList.iterator();
     boolean found = false;
 
@@ -87,9 +91,10 @@ public class CookBook {
   /**
    * Checks if a given recipe can be made with the current items in the fridge.
    *
-   * @param recipe * The recipe in question.
+   * @param recipe The recipe in question.
+   * @return Boolean, true if possible to make.
    */
-  public static Boolean recipeCheck(Recipe recipe) {
+  public static boolean recipeCheck(Recipe recipe) {
     //ChatGPT
     return recipe.getFoods().stream()
         //All instances of food (all Grocery objects within recipe) must match the condition.
