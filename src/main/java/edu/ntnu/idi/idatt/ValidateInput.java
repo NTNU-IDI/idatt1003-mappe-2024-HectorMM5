@@ -1,8 +1,5 @@
 package edu.ntnu.idi.idatt;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -34,6 +31,12 @@ public class ValidateInput {
     return input.trim();
   }
 
+  /**
+   * Forces the user to input a valid float, through scanner.
+   *
+   * @param scanner Scanner object to access user input.
+   * @return The validated float.
+   */
 
   public static float forceValidFloat(Scanner scanner) {
     float value = 0;
@@ -56,8 +59,9 @@ public class ValidateInput {
   }
 
   /**
-   * Validates a numeric input from the user and converts it to an integer.
+   * Forces the user to input a valid float, through scanner.
    *
+   * @param scanner Scanner object to access user input.
    * @return The validated integer value.
    */
 

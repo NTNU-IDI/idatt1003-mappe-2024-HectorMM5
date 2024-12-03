@@ -14,7 +14,7 @@ class GroceryTest {
   Grocery testGrocery;
   @BeforeEach
   void setUp() {
-    testGrocery = new Grocery("Banana", "KG", 5f, 20, LocalDate.of(2024, 12, 24));
+    testGrocery = new Grocery("Banana", Unit.KILOGRAM, 5f, 20, LocalDate.of(2024, 12, 24));
   }
 
   @Test
@@ -24,7 +24,7 @@ class GroceryTest {
 
   @Test
   void getUnit() {
-    assertEquals("KG", testGrocery.getUnit());
+    assertEquals(Unit.KILOGRAM, testGrocery.getUnit());
   }
 
   @Test
