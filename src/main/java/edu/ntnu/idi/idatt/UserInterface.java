@@ -1,12 +1,13 @@
 package edu.ntnu.idi.idatt;
 
+import java.lang.StringBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
-import java.lang.StringBuilder;
+
 
 
 /**
@@ -138,9 +139,7 @@ public class UserInterface {
 
     if (Fridge.newGrocery(name, unit, amount, cost, expiryDate)) {
       System.out.println("The registration was successful.");
-    }
-
-    else {
+    } else {
       System.out.println("It appears you have previously registered this item under"
           + " a different unit. The operation has been aborted.");
 
@@ -169,9 +168,9 @@ public class UserInterface {
 
     ArrayList<Grocery> result = Fridge.search(Fridge.overview(), groceryName);
     if (result != null) {
-      System.out.println("The item was found. Search result:");
+      System.out.println("The item was found. Search results:");
       for (Grocery grocery : result) {
-        System.out.println(grocery.toString());
+        System.out.println(presentGrocery(grocery));
       }
 
     } else {
@@ -182,7 +181,7 @@ public class UserInterface {
   private void handleOverview() {
     ArrayList<Grocery> items = Fridge.overview();
     for (Grocery grocery : items) {
-      System.out.println(grocery.toString());
+      System.out.println(presentGrocery(grocery));
     }
     System.out.println("The combined value of items in the fridge is: "
         + Fridge.calculateValue(items) + " euros.");
@@ -194,7 +193,7 @@ public class UserInterface {
     if (!expiredItems.isEmpty()) {
       System.out.println("These items have expired, but they may still be consumable.");
       for (Grocery grocery : expiredItems) {
-        System.out.println(grocery.toString());
+        System.out.println(presentGrocery(grocery));
       }
 
       System.out.println("You may have lost up to " + Fridge.calculateValue(expiredItems)
@@ -229,7 +228,7 @@ public class UserInterface {
       System.out.println("The following groceries will expire before " + dateToText + ":");
 
       for (Grocery grocery : Fridge.expiresBefore(expiryDate)) {
-        System.out.println(grocery.toString());
+        System.out.println(presentGrocery(grocery));
       }
     }
   }
@@ -492,5 +491,35 @@ public class UserInterface {
     System.out.println("    - \"/printRecipe\" to print the details of a specific recipe.");
     System.out.println("    - \"/listRecipes\" to list all recipes saved in the cookbook.");
     System.out.println("    - \"/deleteRecipe\" to delete a recipe by its name.");
+  }
+
+  String presentGrocery(Grocery grocery) {
+    StringBuilder builder = new StringBuilder();
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+    String dateToText = grocery.getExpiryDate().format(dateTimeFormatter);
+
+    builder.append("    - ");
+    builder.append(grocery.getName());
+    builder.append(": ");
+    builder.append(grocery.getAmount());
+    builder.append(" ");
+    builder.append(grocery.getUnit());
+    builder.append(" (Expires: ");
+    builder.append(dateToText);
+    builder.append(")");
+
+    return builder.toString();
+  }
+
+  String presentIngredient(Grocery grocery) {
+    StringBuilder builder = new StringBuilder();
+    builder.append("    - ");
+    builder.append(grocery.getAmount());
+    builder.append(" ");
+    builder.append(grocery.getUnit());
+    builder.append(" ");
+    builder.append(grocery.getName());
+
+    return builder.toString();
   }
 }
