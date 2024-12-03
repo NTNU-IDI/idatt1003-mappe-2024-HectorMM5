@@ -18,8 +18,8 @@ class RecipeTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> foods = new ArrayList<>();
-    foods.add(new Grocery("Tomato", "kg", 2f));
-    foods.add(new Grocery("Salt", "g", 5f));
+    foods.add(new Grocery("Tomato", Unit.KILOGRAM, 2f));
+    foods.add(new Grocery("Salt", Unit.GRAM, 5f));
 
     testRecipe = new Recipe("Tomato Soup", "A simple tomato soup recipe.", instructions, foods, 4);
   }

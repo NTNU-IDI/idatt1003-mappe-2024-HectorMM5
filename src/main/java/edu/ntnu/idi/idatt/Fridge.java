@@ -4,28 +4,50 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 /**
  * Fridge represents the food storage, keeping accessible grocery objects.
  */
 public class Fridge {
 
-  private static final ArrayList<Grocery> ingredients = new ArrayList<>();
+  private static final ArrayList<Grocery> groceries = new ArrayList<>();
+  private static final ArrayList<Grocery> groceryProfiles = new ArrayList<>();
 
 
 
   /**
    * Guides the user through creating a new grocery item.
    */
-  public static void newGrocery(String name, String unit, float amount, float cost,
+  public static Boolean newGrocery(String name, Unit unit, float amount, float cost,
                                 LocalDate expiryDate) {
-    ingredients.add(new Grocery(name, unit, amount, cost, expiryDate));
+    //ChatGPT
+    Optional<Grocery> matchingProfile = groceryProfiles.stream()
+        .filter(profile -> profile.getName().equalsIgnoreCase(name))
+        .findFirst();
+
+    if (matchingProfile.isPresent()) {
+      Grocery foundProfile = matchingProfile.get();
+      //If new grocery unit type is equal to profile metric type, proceed.
+      if (foundProfile.getUnit().getMetricType().equalsIgnoreCase(unit.getMetricType())) {
+        groceries.add(new Grocery(name, unit, amount, cost, expiryDate));
+        return true;
+      } else {
+        return false;
+      }
+    }
+    //If no item under this name has been created, create item and item profile.
+    groceries.add(new Grocery(name, unit, amount, cost, expiryDate));
+    groceryProfiles.add(new Grocery(name, unit));
+    return true;
+
   }
 
   /**
    * Represents different outcomes for the "use" function.
-   * Used to give the user appropriate feedback.
+   * Used to give the logic, and thus the user, appropriate feedback.
    */
   public enum UseStatus {
     SUCCESS,
@@ -41,7 +63,7 @@ public class Fridge {
    */
   public static UseStatus use(String name, float consume) {
 
-    ArrayList<Grocery> matchingGroceries = search(name);
+    ArrayList<Grocery> matchingGroceries = search(groceries, name);
 
     if (!matchingGroceries.isEmpty()) {
       matchingGroceries = matchingGroceries.stream()
@@ -56,7 +78,7 @@ public class Fridge {
       if (totalAmount >= consume) {
         Iterator<Grocery> iterator = matchingGroceries.iterator();
 
-        while (consume > 0) {
+        while (consume > 0.00001) {
           Grocery grocery = iterator.next();
           if (grocery.getAmount() > consume) {
             grocery.setAmount(grocery.getAmount() - consume);
@@ -66,7 +88,7 @@ public class Fridge {
             grocery.setAmount(0);
           }
         }
-        ingredients.removeIf(grocery -> grocery.getAmount() == 0);
+        groceries.removeIf(grocery -> grocery.getAmount() < 0.00001);
 
         return UseStatus.SUCCESS;
 
@@ -84,30 +106,30 @@ public class Fridge {
    * @param name * Ingredient's name.
    * @return List of matching Grocery objects.
    */
-  public static ArrayList<Grocery> search(String name) {
-    return ingredients.stream()
+  public static ArrayList<Grocery> search(ArrayList<Grocery> list, String name) {
+    return list.stream()
         .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
-   * Returns a sorted overview of the ingredients.
+   * Returns a sorted overview of the groceries.
    *
-   * @return A new sorted list of all ingredients.
+   * @return A new sorted list of all groceries.
    */
   public static ArrayList<Grocery> overview() {
-    return ingredients.stream()
+    return groceries.stream()
         .sorted(Comparator.comparing(Grocery::getName))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
-   * Returns all the ingredients that have expired.
+   * Returns all the groceries that have expired.
    *
-   * @return A new list of all expired ingredients.
+   * @return A new list of all expired groceries.
    */
   public static ArrayList<Grocery> dateOverview() {
-    return ingredients.stream()
+    return groceries.stream()
         .sorted(Comparator.comparing(Grocery::getName))
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(LocalDate.now()))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -134,8 +156,22 @@ public class Fridge {
    * @return * ArrayList with Grocery objects
    */
   public static ArrayList<Grocery> expiresBefore(LocalDate date) {
-    return ingredients.stream()
+    return groceries.stream()
         .filter(ingredient -> ingredient.getExpiryDate().isBefore(date))
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  public static ArrayList<Grocery> getGroceryProfiles() {
+    return groceryProfiles;
+  }
+
+  /**
+   * Deletes grocery profile.
+   *
+   * @param name Grocery profile to be searched for and deleted.
+   * @return Boolean, notifying of the operation's outcome.
+   */
+  public static boolean deleteProfile(String name) {
+    return groceryProfiles.removeIf(ingredient -> ingredient.getName().equalsIgnoreCase(name));
   }
 }

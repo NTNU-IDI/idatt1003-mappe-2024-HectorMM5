@@ -27,7 +27,7 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Tomato", "kg", 1.0f));
+    ingredients.add(new Grocery("Tomato", Unit.KILOGRAM, 1.0f));
 
     CookBook.createRecipe("Tomato Soup", "A simple tomato soup.", instructions, ingredients, 2);
   }
@@ -40,7 +40,7 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Carrot", "kg", 1.0f));
+    ingredients.add(new Grocery("Carrot", Unit.KILOGRAM, 1.0f));
 
     CookBook.createRecipe("Shredded carrots", "Carrots but shredded.", instructions, ingredients, 2);
 
@@ -58,13 +58,13 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Pasta", "g", 200.0f));
-    ingredients.add(new Grocery("Salt", "g", 10.0f));
+    ingredients.add(new Grocery("Pasta", Unit.GRAM, 200.0f));
+    ingredients.add(new Grocery("Salt", Unit.GRAM, 10.0f));
 
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
 
     // Adding enough tomatoes for the default "Tomato soup" recipe
-    Fridge.newGrocery("Tomato", "kg", 3.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Tomato", Unit.KILOGRAM, 3.0f, 10, LocalDate.of(2025, 1, 1));
 
     //Since only Tomato soup has the necessary ingredients, only it should pass
     ArrayList<Recipe> recipes = CookBook.getRecipes();
@@ -82,8 +82,8 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Pasta", "g", 200.0f));
-    ingredients.add(new Grocery("Salt", "g", 10.0f));
+    ingredients.add(new Grocery("Pasta", Unit.GRAM, 200.0f));
+    ingredients.add(new Grocery("Salt", Unit.GRAM, 10.0f));
 
     // Create new recipe to differentiate
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);
@@ -104,8 +104,8 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Pasta", "g", 200.0f));
-    ingredients.add(new Grocery("Salt", "g", 10.0f));
+    ingredients.add(new Grocery("Pasta", Unit.GRAM, 200.0f));
+    ingredients.add(new Grocery("Salt", Unit.GRAM, 10.0f));
 
     // Two recipes to ensure both are returned
     // A third to ensure it gets filtered away
@@ -113,13 +113,13 @@ class CookBookTest {
     CookBook.createRecipe("Simpler pasta", "Even simpler pasta recipe.", instructions, ingredients, 2);
 
     ArrayList<Grocery> fake = new ArrayList<>();
-    fake.add(new Grocery("Fake", "g", 1));
+    fake.add(new Grocery("Fake", Unit.GRAM, 1));
 
     CookBook.createRecipe("Z", "Fake pasta recipe.", instructions, fake, 2);
 
     // Store ingredients needed to make the recipe
-    Fridge.newGrocery("Pasta", "g", 250.0f, 10, LocalDate.of(2025, 1, 1));
-    Fridge.newGrocery("Salt", "g", 20.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Pasta", Unit.GRAM, 250.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Salt", Unit.GRAM, 20.0f, 10, LocalDate.of(2025, 1, 1));
 
     ArrayList<Recipe> recipes = CookBook.getRecipes();
     ArrayList<Recipe> availableRecipes = CookBook.recipeAvailability();
@@ -148,8 +148,8 @@ class CookBookTest {
     instructions.add("Step 3");
 
     ArrayList<Grocery> ingredients = new ArrayList<>();
-    ingredients.add(new Grocery("Pasta", "g", 200.0f));
-    ingredients.add(new Grocery("Salt", "g", 10.0f));
+    ingredients.add(new Grocery("Pasta", Unit.GRAM, 200.0f));
+    ingredients.add(new Grocery("Salt", Unit.GRAM, 10.0f));
 
     // Make an object, then search and compare it
     CookBook.createRecipe("Pasta", "Simple pasta recipe.", instructions, ingredients, 2);

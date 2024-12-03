@@ -16,7 +16,7 @@ public class FridgeTest {
       Fridge.use(grocery.getName(), grocery.getAmount());
     }
 
-    Fridge.newGrocery("Chocolate", "KG", 1, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1));
 
   }
 
@@ -24,28 +24,28 @@ public class FridgeTest {
   void newGrocery() {
 
     //Creates a new grocery
-    Fridge.newGrocery("White chocolate", "KG", 1, 10, LocalDate.of(2020, 1, 1));
+    Fridge.newGrocery("White chocolate", Unit.GRAM, 100, 10, LocalDate.of(2020, 1, 1));
     ArrayList<Grocery> ingredients = Fridge.overview();
 
     //Checks each field individually, to ensure proper implementation
     assertEquals("White chocolate", ingredients.get(1).getName());
-    assertEquals("KG", ingredients.get(1).getUnit());
-    assertEquals(1, ingredients.get(1).getAmount());
-    assertEquals(10, ingredients.get(1).getCost());
+    assertEquals(Unit.GRAM, ingredients.get(1).getUnit());
+    assertEquals(0.1, ingredients.get(1).getAmount(), 0.00001);
+    assertEquals(100, ingredients.get(1).getCost());
     assertEquals(LocalDate.of(2020, 1, 1), ingredients.get(1).getExpiryDate());
 
     //Checks to-string method
     assertEquals(ingredients.get(1).toString(),
-        new Grocery("White chocolate", "KG", 1, 10, LocalDate.of(2020, 1, 1)).toString());
+        new Grocery("White chocolate", Unit.GRAM, 100, 10, LocalDate.of(2020, 1, 1)).toString());
   }
 
   @Test
   void usePositive() {
 
     //Uses half the amount (0.5), then compares the returned output state
-    assertEquals(Fridge.use("Chocolate", 0.5f), Fridge.UseStatus.SUCCESS);
+    assertEquals(Fridge.use("Chocolate", 0.05f), Fridge.UseStatus.SUCCESS);
     //Checks the remaining amount
-    assertEquals(0.5f, Fridge.overview().get(0).getAmount());
+    assertEquals(0.05f, Fridge.overview().get(0).getAmount());
   }
 
   @Test
@@ -66,10 +66,10 @@ public class FridgeTest {
   void useMultiple() {
 
     //Creates a new object with an amount of two, then attempts to use both to reach "consume" total
-    Fridge.newGrocery("Chocolate", "KG", 2, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Chocolate", Unit.GRAM, 200, 10, LocalDate.of(2025, 1, 1));
 
     //As there is 1 kg in the default "Chocolate", and 2 kg are added, the total should suffice
-    assertSame(Fridge.use("Chocolate", 3), Fridge.UseStatus.SUCCESS);
+    assertSame(Fridge.use("Chocolate", 0.3f), Fridge.UseStatus.SUCCESS);
     assertSame(Fridge.overview().size(), 0);
   }
 
@@ -77,21 +77,21 @@ public class FridgeTest {
   void useMultipleInsufficientAmount() {
 
     //Creates a new object with an amount of two, then attempts to use both to reach "consume" total
-    Fridge.newGrocery("Chocolate", "KG", 2, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Chocolate", Unit.GRAM, 200, 10, LocalDate.of(2025, 1, 1));
 
     //Regardless of the addition, there should not be enough
-    assertSame(Fridge.use("Chocolate", 10), Fridge.UseStatus.INSUFFICIENT_AMOUNT);
+    assertSame(Fridge.use("Chocolate", 1), Fridge.UseStatus.INSUFFICIENT_AMOUNT);
 
     //The objects were not used
     assertSame(Fridge.overview().size(), 2);
-    assertEquals(3, Fridge.overview().get(0).getAmount() + Fridge.overview().get(1).getAmount());
+    assertEquals(0.3, Fridge.overview().get(0).getAmount() + Fridge.overview().get(1).getAmount(), 0.00001);
   }
 
   @Test
   void useExactMatch() {
 
     //Exact amount check
-    Fridge.newGrocery("Milk", "L", 1.0f, 5, LocalDate.of(2025, 12, 1));
+    Fridge.newGrocery("Milk", Unit.LITRE, 1.0f, 5, LocalDate.of(2025, 12, 1));
     assertSame(Fridge.use("Milk", 1.0f), Fridge.UseStatus.SUCCESS);
 
     //Item is deleted once amount reaches 0, so only the default value should remain
@@ -102,22 +102,22 @@ public class FridgeTest {
   void searchPositive() {
 
     //Objects exists, so an identical objects is created with the same fields, and thus, to-string strings
-    assertEquals(Fridge.search("Chocolate").get(0).toString(),
-        new Grocery("Chocolate", "KG", 1, 10, LocalDate.of(2025, 1, 1)).toString());
+    assertEquals(Fridge.search(Fridge.overview(), "Chocolate").get(0).toString(),
+        new Grocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1)).toString());
   }
 
   @Test
   void searchNegative() {
 
     //Searches for a name that doesn't exist, returned ArrayList should be empty
-    assertEquals(0, Fridge.search("Dark chocolate").size());
+    assertEquals(0, Fridge.search(Fridge.overview(),"Dark chocolate").size());
   }
 
   @Test
   void overview() {
 
     //New item is created, but apple is added at the end of the list
-    Fridge.newGrocery("Apple", "KG", 1, 10, LocalDate.of(2024, 12, 1));
+    Fridge.newGrocery("Apple", Unit.KILOGRAM, 1, 10, LocalDate.of(2024, 12, 1));
     ArrayList<Grocery> overview = Fridge.overview();
 
     //As overview() returns an alphabetically sorted list, Apple should be found in the first index
@@ -130,7 +130,7 @@ public class FridgeTest {
   void dateOverviewWithExpiredItems() {
 
     //An expired item is added, as the default item is not expired
-    Fridge.newGrocery("Milk", "L", 1, 5, LocalDate.of(2019, 12, 1)); // Expired
+    Fridge.newGrocery("Milk", Unit.LITRE, 1, 5, LocalDate.of(2019, 12, 1)); // Expired
 
     ArrayList<Grocery> dateOverview = Fridge.dateOverview();
 
@@ -143,7 +143,7 @@ public class FridgeTest {
   void calculateValue() {
 
     //Adds another object
-    Fridge.newGrocery("Milk", "L", 2, 3, LocalDate.of(2025, 5, 1));
+    Fridge.newGrocery("Milk", Unit.LITRE, 2, 3, LocalDate.of(2025, 5, 1));
 
     //Value is calculated as a total for the given amount (as shown on the receipt)
     int total = Fridge.calculateValue(Fridge.overview());

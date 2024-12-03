@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.lang.StringBuilder;
+
 
 /**
  * Class that handles the main user interface.
@@ -15,7 +18,7 @@ public class UserInterface {
   /**
    * Handles the users actions in an infinite loop, until the program is terminated.
    *
-   * @param scanner  * Scanner object to take in user input.
+   * @param scanner * Scanner object to take in user input.
    */
   public void start(Scanner scanner) {
 
@@ -112,7 +115,7 @@ public class UserInterface {
     final String name = ValidateInput.forceValidString(scanner);
 
     System.out.println("Write the unit of the grocery.");
-    final String unit = ValidateInput.forceValidString(scanner);
+    final Unit unit = Unit.forceValidUnit(scanner);
 
     System.out.println("Enter the amount (in numeric format):");
     final float amount = ValidateInput.forceValidFloat(scanner);
@@ -133,7 +136,17 @@ public class UserInterface {
       }
     }
 
-    Fridge.newGrocery(name, unit, amount, cost, expiryDate);
+    if (Fridge.newGrocery(name, unit, amount, cost, expiryDate)) {
+      System.out.println("The registration was successful.");
+    }
+
+    else {
+      System.out.println("It appears you have previously registered this item under"
+          + " a different unit. The operation has been aborted.");
+
+      System.out.println("If you want to reset your settings for this item, you may run the command"
+          + " \"/deleteProfile\"");
+    }
   }
 
   private void handleUse(Scanner scanner) {
@@ -154,7 +167,7 @@ public class UserInterface {
     System.out.println("Write the name of the grocery:");
     String groceryName = ValidateInput.forceValidString(scanner);
 
-    ArrayList<Grocery> result = Fridge.search(groceryName);
+    ArrayList<Grocery> result = Fridge.search(Fridge.overview(), groceryName);
     if (result != null) {
       System.out.println("The item was found. Search result:");
       for (Grocery grocery : result) {
@@ -195,20 +208,35 @@ public class UserInterface {
 
   private void handleExpiresBefore(Scanner scanner) {
     System.out.println("Enter the expiry date (in numeric format, e.g., DDMMYYYY):");
-    LocalDate expiryDate;
-    while (true) {
+
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+
+    LocalDate expiryDate = null;
+    while (expiryDate == null) {
       try {
-        expiryDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("ddMMyyyy"));
-        break;
+        expiryDate = LocalDate.parse(scanner.nextLine(), dateTimeFormatter);
+
       } catch (DateTimeParseException e) {
         System.out.println("Invalid input, please enter the date in the format DDMMYYYY:");
       }
     }
-    Fridge.expiresBefore(expiryDate);
+
+    ArrayList<Grocery> willExpire = Fridge.expiresBefore(expiryDate);
+
+    if (!willExpire.isEmpty()) {
+      //Makes a user-friendly string, representing the date
+      String dateToText = expiryDate.format(dateTimeFormatter);
+      System.out.println("The following groceries will expire before " + dateToText + ":");
+
+      for (Grocery grocery : Fridge.expiresBefore(expiryDate)) {
+        System.out.println(grocery.toString());
+      }
+    }
   }
 
   private void handleValue() {
-    Fridge.calculateValue(Fridge.overview());
+    System.out.println("The current value of items in the fridge is: "
+        + Fridge.calculateValue(Fridge.overview()) + " euros.");
   }
 
   //
@@ -282,55 +310,82 @@ public class UserInterface {
     System.out.println("Write the name of the dish:");
     final String dishName = ValidateInput.forceValidString(scanner);
 
-    //If no dish with this name already exists:
-    if (CookBook.search(dishName) == null) {
-      System.out.println("Write a short description of the dish:");
-      final String description = ValidateInput.forceValidString(scanner);
-
-      ArrayList<Grocery> ingredients = new ArrayList<>();
-      System.out.println("Specify the ingredients in the format: name, amount, unit.");
-      System.out.println("Write \"Done\" when finished.");
-
-      String line = "";
-      while (!line.equalsIgnoreCase("Done")) {
-        line = ValidateInput.forceValidString(scanner);
-
-        String[] parts = line.split(",");
-        if (parts.length == 3) {
-          try {
-            float amount = Float.parseFloat(parts[1].trim());
-            if (amount > 0) {
-              ingredients.add(new Grocery(parts[0].trim(), parts[2].trim(), amount));
-            } else {
-              System.out.println("Amount must be larger than zero. Try again.");
-            }
-          } catch (NumberFormatException e) {
-            System.out.println("Invalid amount. Use numeric values.");
-          }
-        } else {
-          System.out.println("Invalid format. Use: name, amount, unit.");
-        }
-      }
-
-      final ArrayList<String> instructions = new ArrayList<>();
-      System.out.println("Write the instructions, one line at a time.");
-      System.out.println("Write \"Done\" when finished.");
-
-      line = "";
-      while (!line.equalsIgnoreCase("Done")) {
-        line = ValidateInput.forceValidString(scanner);
-        instructions.add(line);
-      }
-
-      System.out.println("How many portions does this make?");
-      int portions = ValidateInput.forceValidInteger(scanner);
-
-      CookBook.createRecipe(dishName, description, instructions, ingredients, portions);
-      System.out.println("Recipe saved successfully.");
-    } else {
+    //If a dish with this name already exists, abort operation with early return
+    if (CookBook.search(dishName) != null) {
       System.out.println("A recipe with the given name already exists. Aborting operation.");
+      return;
     }
 
+    System.out.println("Write a short description of the dish:");
+    final String description = ValidateInput.forceValidString(scanner);
+
+    ArrayList<Grocery> ingredients = new ArrayList<>();
+    System.out.println("Specify the ingredients in the format: name, amount, unit.");
+    System.out.println("Write \"Done\" when finished.");
+
+    String line = "";
+    while (!line.equalsIgnoreCase("Done")) {
+      line = ValidateInput.forceValidString(scanner);
+      String[] parts = line.split(",");
+
+      if (parts.length != 3 && !line.equalsIgnoreCase("Done")) {
+        //User input was invalid, new loop instance created
+        System.out.println("Invalid format. Use: name, amount, unit.");
+        continue;
+      }
+
+      String name = parts[0].trim();
+      try {
+        //Tries parsing amount and searching for unit
+        float amount = Float.parseFloat(parts[1].trim());
+        Unit unit = Unit.searchMetric(parts[2].trim());
+
+        if (amount * unit.getValue() > 0.00001) {
+
+          ArrayList<Grocery> results = Fridge.search(Fridge.overview(), parts[0].trim());
+
+          if (!results.isEmpty()) {
+            String existingUnit = results.get(0).getUnit().getMetricType();
+            if (!existingUnit.equalsIgnoreCase(unit.getMetricType())) {
+              //Ensures user isn't registering under a different unit type
+              System.out.println("Unit mismatch. "
+                  + "The existing unit for \"" + name + "\" is " + existingUnit + ".");
+              break;
+            }
+          }
+
+          ingredients.add(new Grocery(parts[0].trim(), unit, amount));
+
+        } else {
+          System.out.println("Amount must be larger than zero. Try again.");
+        }
+      } catch (NumberFormatException e) {
+        //If parsing fails
+        System.out.println("Invalid amount. Please use appropriate values.");
+
+      } catch (IllegalArgumentException e) {
+        //If a unit is not found
+        System.out.println("Unit must be one of the following: g, kg, L or mL. Try again.");
+      }
+
+    }
+
+
+    final ArrayList<String> instructions = new ArrayList<>();
+    System.out.println("Write the instructions, one line at a time.");
+    System.out.println("Write \"Done\" when finished.");
+
+    line = "";
+    while (!line.equalsIgnoreCase("Done")) {
+      line = ValidateInput.forceValidString(scanner);
+      instructions.add(line);
+    }
+
+    System.out.println("How many portions does this make?");
+    int portions = ValidateInput.forceValidInteger(scanner);
+
+    CookBook.createRecipe(dishName, description, instructions, ingredients, portions);
+    System.out.println("Recipe saved successfully.");
   }
 
 
@@ -389,8 +444,17 @@ public class UserInterface {
   }
 
   void handleAllRecipes() {
-    for (Recipe recipe : CookBook.getRecipes()) {
-      System.out.println(recipe.getName() + " - " + recipe.getPortions() + " portions");
+    System.out.println("Here are all the registered recipes:");
+    Iterator<Recipe> iterator = CookBook.getRecipes().iterator();
+
+    //Counter variable, to numerate the recipes
+    int count = 1;
+
+    while (iterator.hasNext()) {
+      Recipe recipe = iterator.next();
+      System.out.println(count + ". " + recipe.getName() + " - " + recipe.getPortions()
+          + " portions");
+      count++;
     }
   }
 
@@ -398,9 +462,9 @@ public class UserInterface {
    * Prints out an overview of all the fridge-related commands.
    */
   void fridgeHelp() {
-    System.out.println("-----------------------------------------------------------");
-    System.out.println("An overview of available FRIDGE commands can be seen below:");
-    System.out.println("-----------------------------------------------------------");
+    System.out.println("------------------------------------------------------------------------");
+    System.out.println("      An overview of available FRIDGE commands can be seen below:");
+    System.out.println("------------------------------------------------------------------------");
     System.out.println("\n    - \"/newItem\" to add a new item.");
     System.out.println("    - \"/use\" to retrieve an item.");
     System.out.println(
@@ -417,9 +481,9 @@ public class UserInterface {
    */
 
   void cookBookHelp() {
-    System.out.println("--------------------------------------------------------");
-    System.out.println("An overview of available cookbook commands can be seen below:");
-    System.out.println("--------------------------------------------------------");
+    System.out.println("------------------------------------------------------------------------");
+    System.out.println("     An overview of available cookbook commands can be seen below:");
+    System.out.println("------------------------------------------------------------------------");
     System.out.println("\n    - \"/createRecipe\" to create a new recipe.");
     System.out.println("    - \"/availableRecipes\" to view recipes you can make with the "
         + "ingredients in the fridge.");

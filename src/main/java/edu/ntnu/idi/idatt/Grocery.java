@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class Grocery {
 
   private final String name;
-  private final String unit;
+  private final Unit unit;
   private float amount;
   private float cost;
   private LocalDate expiryDate;
@@ -25,10 +25,10 @@ public class Grocery {
    * @param expiryDate * LocalDate object, represents the expiry date of the grocery.
    */
 
-  public Grocery(String name, String unit, float amount, float cost, LocalDate expiryDate) {
+  public Grocery(String name, Unit unit, float amount, float cost, LocalDate expiryDate) {
     this.name = name;
     this.unit = unit;
-    this.amount = amount;
+    this.amount = amount * unit.getValue();
     this.cost = cost / this.amount;
     this.expiryDate = expiryDate;
 
@@ -42,18 +42,30 @@ public class Grocery {
    * @param unit   unit of grocery
    * @param amount amount of grocery
    */
-  public Grocery(String name, String unit, float amount) {
+  public Grocery(String name, Unit unit, float amount) {
     this.name = name;
     this.unit = unit;
-    this.amount = amount;
+    this.amount = amount * unit.getValue();
 
+  }
+
+  /**
+   * Creates a grocery item with these parameters. Used exclusively for profiles.
+   * Purpose: (example) User may not register an item as grams and attempt to use pieces.
+   *
+   * @param name name of grocery
+   * @param unit unit of grocery
+   */
+  public Grocery(String name, Unit unit) {
+    this.name = name;
+    this.unit = unit;
   }
 
   public String getName() {
     return this.name;
   }
 
-  public String getUnit() {
+  public Unit getUnit() {
     return this.unit;
   }
 
@@ -86,8 +98,8 @@ public class Grocery {
 
   @Override
   public String toString() {
-    return (name + " " + amount + " " + unit + " " + "(costs " + cost + " euros per " + unit
-        + ") " + "(" + expiryDate + ")");
+    return (name + " " + amount + " " + unit + " " + "(costs " + cost + " euros per "
+        + unit.getMetric() + ") " + "(" + expiryDate + ")");
 
   }
 
