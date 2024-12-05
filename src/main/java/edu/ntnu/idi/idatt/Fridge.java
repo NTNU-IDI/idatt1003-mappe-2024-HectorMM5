@@ -17,9 +17,15 @@ public class Fridge {
   private static final ArrayList<Grocery> groceryProfiles = new ArrayList<>();
 
 
-
   /**
-   * Guides the user through creating a new grocery item.
+      * Creates a new grocery item. Ensures unit mismatch does not occur.
+   *
+   * @param name Grocery's name
+   * @param unit Grocery's unit (Unit enum)
+   * @param amount Grocery's amount
+   * @param cost Grocery's total cost
+   * @param expiryDate Grocery's expiry date (LocalDate)
+   * @return Boolean. If successful creation, true.
    */
   public static Boolean newGrocery(String name, Unit unit, float amount, float cost,
                                 LocalDate expiryDate) {
@@ -42,6 +48,16 @@ public class Fridge {
     groceries.add(new Grocery(name, unit, amount, cost, expiryDate));
     groceryProfiles.add(new Grocery(name, unit));
     return true;
+
+  }
+
+  /**
+   * Adds a grocery profile.
+   * @param name Grocery's name
+   * @param unit Grocery's unit (Unit enum)
+   */
+  public static void createGroceryProfile(String name, Unit unit) {
+    groceryProfiles.add(new Grocery(name, unit));
 
   }
 

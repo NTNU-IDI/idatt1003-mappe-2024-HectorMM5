@@ -384,37 +384,57 @@ public class UserInterface {
       line = ValidateInput.forceValidString(scanner);
       String[] parts = line.split(",");
 
-      if (parts.length != 3 && !line.equalsIgnoreCase("Done")) {
+      //Input verification:
+      if (parts.length != 3) {
         //User input was invalid, new loop instance created
-        System.out.println("Invalid format. Use: name, amount, unit.");
+        System.out.println("Invalid format. Use: name, amount, unit. Write \"Done\" when finished");
         continue;
       }
 
       String name = parts[0].trim();
+      if (name.isEmpty()) {
+        //Name was empty, new loop instance created
+        System.out.println("Name cannot be empty.");
+        continue;
+      }
+
       try {
         //Tries parsing amount and searching for unit
         float amount = Float.parseFloat(parts[1].trim());
         Unit unit = Unit.searchMetric(parts[2].trim());
 
-        if (amount * unit.getValue() > 0.00001) {
+        //If amount is above 0, check for existing food profiles, to ensure correct functionality
+        //Limits the user's ability to break the program by typing in a very small amount
 
-          ArrayList<Grocery> results = Fridge.search(Fridge.overview(), parts[0].trim());
-
-          if (!results.isEmpty()) {
-            String existingUnit = results.get(0).getUnit().getMetricType();
-            if (!existingUnit.equalsIgnoreCase(unit.getMetricType())) {
-              //Ensures user isn't registering under a different unit type
-              System.out.println("Unit mismatch. "
-                  + "The existing unit for \"" + name + "\" is " + existingUnit + ".");
-              break;
-            }
-          }
-
-          ingredients.add(new Grocery(parts[0].trim(), unit, amount));
-
-        } else {
+        if (!(amount * unit.getValue() > 0.00001)) {
           System.out.println("Amount must be larger than zero. Try again.");
+          //Early continue
+          continue;
         }
+
+        //Gets the profiles for all groceries so far
+        ArrayList<Grocery> existingUnits =
+            Fridge.search(Fridge.getGroceryProfiles(), parts[0].trim());
+
+        if (!existingUnits.isEmpty()) {
+          //Only one object should be present in this list
+          String existingUnit = existingUnits.get(0).getUnit().getMetricType();
+          if (!existingUnit.equalsIgnoreCase(unit.getMetricType())) {
+            //Ensures user isn't registering under a different unit type
+            System.out.println("Unit mismatch. "
+                + "The existing unit for \"" + name + "\" is " + existingUnit + ".");
+            System.out.println("Try again.");
+            continue;
+          } else {
+            ingredients.add(new Grocery(name, unit, amount));
+          }
+        } else {
+          //If no grocery profile was found, this is the first time the object is created
+          //Therefore, add the ingredient and create the grocery profile
+          ingredients.add(new Grocery(name, unit, amount));
+          Fridge.createGroceryProfile(name, unit);
+        }
+
       } catch (NumberFormatException e) {
         //If parsing fails
         System.out.println("Invalid amount. Please use appropriate values.");
@@ -423,9 +443,7 @@ public class UserInterface {
         //If a unit is not found
         System.out.println("Unit must be one of the following: g, kg, L or mL. Try again.");
       }
-
     }
-
 
     final ArrayList<String> instructions = new ArrayList<>();
     System.out.println("Write the instructions, one line at a time.");
