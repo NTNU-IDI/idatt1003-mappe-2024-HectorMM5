@@ -1,13 +1,11 @@
 package edu.ntnu.idi.idatt;
 
-import java.lang.StringBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
-
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -15,6 +13,26 @@ import java.util.Scanner;
  */
 
 public class UserInterface {
+
+  /**
+   * Initializes a set of default groceries.
+   */
+  public void init() {
+    LocalDate defaultDate = LocalDate.of(2024, 12, 24);
+    //Creates default groceries
+    Fridge.newGrocery("Banana", Unit.PIECES, 3, 30, defaultDate);
+    Fridge.newGrocery("Milk", Unit.LITRE, 1.75f, 35, defaultDate);
+    Fridge.newGrocery("Chocolate", Unit.GRAM, 200, 45, defaultDate);
+
+    System.out.println("\033[38;2;205;127;50m"
+        + "=================================================\033[0m");
+
+    System.out.println("\033[38;2;234;221;202m     WELCOME TO YOUR PERSONAL FOOD REGISTRY!     ");
+    System.out.println("\033[38;2;234;221;202m   Manage your fridge, plan recipes, and more.   ");
+    System.out.println("\033[38;2;205;127;50m"
+        + "=================================================\033[0m");
+
+  }
 
   /**
    * Entry point.
@@ -25,8 +43,7 @@ public class UserInterface {
 
   public void start(Scanner scanner) {
 
-    System.out.println("Welcome to your food registry:"
-        + "\nWrite \"1\" to access the fridge."
+    System.out.println("\033[38;2;234;221;202m\nWrite \"1\" to access the fridge."
         + "\nWrite \"2\" to access the cookbook."
         + "\nWrite \"3\" to terminate the program.");
 
@@ -68,8 +85,7 @@ public class UserInterface {
   private void enteredFridge(Scanner scanner) {
     boolean running = true;
     String command;
-    System.out.println("You have now accessed the fridge."
-        + "Enter command, or write \"/help\" to view the available commands.");
+    System.out.println("Enter command, or write \"/help\" to view the available commands.");
 
     while (running) {
       command = ValidateInput.forceValidString(scanner);
@@ -189,16 +205,11 @@ public class UserInterface {
     System.out.println("Write the name of the grocery:");
     String groceryName = ValidateInput.forceValidString(scanner);
 
-    ArrayList<Grocery> result = Fridge.search(Fridge.overview(), groceryName);
-    if (result != null) {
-      System.out.println("The item was found. Search results:");
-      for (Grocery grocery : result) {
-        System.out.println(presentGrocery(grocery));
-      }
+    ArrayList<Grocery> result = Utility.search(Fridge.overview(), groceryName);
 
-    } else {
-      System.out.println("The ingredient you're looking for does not exist.");
-    }
+    Utility.displayList(result,
+        "Search results:",
+        "The ingredient you're looking for does not exist.");
   }
 
   /**
@@ -206,11 +217,13 @@ public class UserInterface {
    */
   private void handleOverview() {
     ArrayList<Grocery> items = Fridge.overview();
-    for (Grocery grocery : items) {
-      System.out.println(presentGrocery(grocery));
-    }
+
+    Utility.displayList(items,
+        "All groceries are displayed below:",
+        "The fridge is empty.");
+
     System.out.println("The combined value of items in the fridge is: "
-        + Fridge.calculateValue(items) + " euros.");
+        + Utility.calculateValue(items) + " euros.");
 
   }
 
@@ -220,18 +233,9 @@ public class UserInterface {
    */
   private void handleExpiredOverview() {
     ArrayList<Grocery> expiredItems = Fridge.dateOverview();
-    if (!expiredItems.isEmpty()) {
-      System.out.println("These items have expired, but they may still be consumable.");
-      for (Grocery grocery : expiredItems) {
-        System.out.println(presentGrocery(grocery));
-      }
-
-      System.out.println("You may have lost up to " + Fridge.calculateValue(expiredItems)
-          + " euros worth of food.");
-    } else {
-      System.out.println("You have no expired items.");
-    }
-
+    Utility.displayList(expiredItems,
+        "The following items are expired:",
+        "None of your items have expired.");
 
   }
 
@@ -255,17 +259,13 @@ public class UserInterface {
       }
     }
 
+    String dateToText = expiryDate.format(dateTimeFormatter);
+
     ArrayList<Grocery> willExpire = Fridge.expiresBefore(expiryDate);
 
-    if (!willExpire.isEmpty()) {
-      //Makes a user-friendly string, representing the date
-      String dateToText = expiryDate.format(dateTimeFormatter);
-      System.out.println("The following groceries will expire before " + dateToText + ":");
-
-      for (Grocery grocery : Fridge.expiresBefore(expiryDate)) {
-        System.out.println(presentGrocery(grocery));
-      }
-    }
+    Utility.displayList(willExpire,
+        null,
+        "The following groceries will expire before " + dateToText + ":");
   }
 
   /**
@@ -273,7 +273,7 @@ public class UserInterface {
    */
   private void handleValue() {
     System.out.println("The current value of items in the fridge is: "
-        + Fridge.calculateValue(Fridge.overview()) + " euros.");
+        + Utility.calculateValue(Fridge.overview()) + " euros.");
   }
 
   //
@@ -289,8 +289,7 @@ public class UserInterface {
   private void enteredCookBook(Scanner scanner) {
     boolean running = true;
     String command;
-    System.out.println("You have now accessed the cookbook."
-        + " Enter a command, or write \"/help\" to view the available commands.");
+    System.out.println("Enter a command, or write \"/help\" to view the available commands.");
 
     while (running) {
       command = ValidateInput.forceValidString(scanner);
@@ -298,6 +297,10 @@ public class UserInterface {
       switch (command) {
         case "/createRecipe":
           handleCreateRecipe(scanner);
+          break;
+
+        case "/cookRecipe":
+          handleCookRecipe(scanner);
           break;
 
         case "/availableRecipes":
@@ -348,6 +351,26 @@ public class UserInterface {
     //If returns true (meaning successful search and deletion):
     if (CookBook.deleteRecipe(choiceName)) {
       System.out.println("Recipe deleted.");
+    } else {
+      System.out.println("A recipe with the given name was not found.");
+    }
+  }
+
+  private void handleCookRecipe(Scanner scanner) {
+    System.out.println("Write the name of the recipe you want to use:");
+    String choiceName = ValidateInput.forceValidString(scanner);
+
+    Recipe recipe = CookBook.search(choiceName);
+
+    if (!(recipe == null)) {
+      boolean available = CookBook.recipeCheck(recipe);
+
+      if (available) {
+        recipe.getFoods()
+            .forEach(grocery -> Fridge.use(grocery.getName(), grocery.getAmount()));
+      } else {
+        System.out.println("You cannot make this recipe right now.");
+      }
     } else {
       System.out.println("A recipe with the given name was not found.");
     }
@@ -414,7 +437,7 @@ public class UserInterface {
 
         //Gets the profiles for all groceries so far
         ArrayList<Grocery> existingUnits =
-            Fridge.search(Fridge.getGroceryProfiles(), parts[0].trim());
+            Utility.search(Fridge.getGroceryProfiles(), parts[0].trim());
 
         if (!existingUnits.isEmpty()) {
           //Only one object should be present in this list
@@ -441,7 +464,7 @@ public class UserInterface {
 
       } catch (IllegalArgumentException e) {
         //If a unit is not found
-        System.out.println("Unit must be one of the following: g, kg, L or mL. Try again.");
+        System.out.println("Unit must be one of the following: g, kg, L, mL or pcs. Try again.");
       }
     }
 
@@ -481,13 +504,11 @@ public class UserInterface {
   void handleCheckRecipe(Scanner scanner) {
     System.out.println("What recipe do you want to check?");
     String choice = ValidateInput.forceValidString(scanner);
-
     Recipe chosenRecipe = CookBook.search(choice);
 
     if (chosenRecipe != null) {
-      boolean found = CookBook.recipeCheck(chosenRecipe);
-
-      if (found) {
+      boolean possible = CookBook.recipeCheck(chosenRecipe);
+      if (possible) {
         System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
       } else {
         System.out.println("Recipe " + chosenRecipe.getName() + " is not possible to make.");
@@ -512,23 +533,22 @@ public class UserInterface {
     if (recipe == null) {
       System.out.println("Recipe " + choice + " was not found.");
     } else {
-
       //Prints out a small presentation
       System.out.println("Recipe " + recipe.getName() + " - " + recipe.getPortions() + " portions"
           + "\n" + recipe.getDescription() + "\n\nYou need:");
 
       //For each specified ingredient, print out the name, amount and unit in a string.
       for (Grocery food : recipe.getFoods()) {
-        System.out.println(
-            "    - " + food.getAmount() + " " + food.getUnit() + " "
-                + food.getName());
+        Utility.presentIngredient(food);
       }
+
       System.out.println("\nInstructions:");
       //For each step in instructions, print out the instruction.
-      //Keeping i in the loop for numbering of steps.
-      for (int i = 0; i < recipe.getInstructions().size(); i++) {
-        System.out.println(i + "." + recipe.getInstructions().get(i));
-      }
+      //ChatGPT
+      AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
+      recipe.getInstructions()
+          .forEach(instruction ->
+              System.out.println(counter.getAndIncrement() + ". " + instruction));
     }
   }
 
@@ -538,17 +558,11 @@ public class UserInterface {
    */
   void handleAllRecipes() {
     System.out.println("Here are all the registered recipes:");
-    Iterator<Recipe> iterator = CookBook.getRecipes().iterator();
+    ArrayList<Recipe> recipes = CookBook.getRecipes();
 
-    //Counter variable, to numerate the recipes
-    int count = 1;
-
-    while (iterator.hasNext()) {
-      Recipe recipe = iterator.next();
-      System.out.println(count + ". " + recipe.getName() + " - " + recipe.getPortions()
-          + " portions");
-      count++;
-    }
+    AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
+    recipes.forEach(instruction ->
+            System.out.println(counter.getAndIncrement() + ". " + instruction));
   }
 
   /**
@@ -566,7 +580,7 @@ public class UserInterface {
     System.out.println(
         "    - \"/expiredOverview\" to check everything in the fridge that has expired.");
     System.out.println("    - \"/value\" to check the value of the food currently in the fridge.");
-    System.out.println("-   - \"/back\" to return to the main menu.");
+    System.out.println("    - \"/back\" to return to the main menu.");
   }
 
   /**
@@ -574,9 +588,11 @@ public class UserInterface {
    */
   void cookBookHelp() {
     System.out.println("------------------------------------------------------------------------");
-    System.out.println("     An overview of available cookbook commands can be seen below:");
+    System.out.println("     An overview of available COOKBOOK commands can be seen below:");
     System.out.println("------------------------------------------------------------------------");
     System.out.println("\n    - \"/createRecipe\" to create a new recipe.");
+    System.out.println("\n    - \"/cookRecipe\" to cook a recipe (consuming their items).");
+
     System.out.println("    - \"/availableRecipes\" to view recipes you can make with the "
         + "ingredients in the fridge.");
     System.out.println("    - \"/checkRecipe\" to check if you have enough ingredients to"
@@ -584,47 +600,5 @@ public class UserInterface {
     System.out.println("    - \"/printRecipe\" to print the details of a specific recipe.");
     System.out.println("    - \"/listRecipes\" to list all recipes saved in the cookbook.");
     System.out.println("    - \"/deleteRecipe\" to delete a recipe by its name.");
-  }
-
-  /**
-   * Formats a Grocery object into a user-friendly string for display.
-   *
-   * @param grocery The Grocery object to format.
-   * @return A formatted string representation of the grocery.
-   */
-  String presentGrocery(Grocery grocery) {
-    StringBuilder builder = new StringBuilder();
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-    String dateToText = grocery.getExpiryDate().format(dateTimeFormatter);
-
-    builder.append("    - ");
-    builder.append(grocery.getName());
-    builder.append(": ");
-    builder.append(grocery.getAmount());
-    builder.append(" ");
-    builder.append(grocery.getUnit());
-    builder.append(" (Expires: ");
-    builder.append(dateToText);
-    builder.append(")");
-
-    return builder.toString();
-  }
-
-  /**
-   * Formats an ingredient into a user-friendly string for display.
-   *
-   * @param grocery The Grocery object representing the ingredient.
-   * @return A formatted string representation of the ingredient.
-   */
-  String presentIngredient(Grocery grocery) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("    - ");
-    builder.append(grocery.getAmount());
-    builder.append(" ");
-    builder.append(grocery.getUnit());
-    builder.append(" ");
-    builder.append(grocery.getName());
-
-    return builder.toString();
   }
 }

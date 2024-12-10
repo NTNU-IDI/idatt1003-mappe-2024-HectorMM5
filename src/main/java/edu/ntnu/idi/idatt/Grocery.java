@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Represents a food/grocery. Takes in name, unit and amount, optionally cost and expiryDate.
@@ -98,8 +99,16 @@ public class Grocery {
 
   @Override
   public String toString() {
+    LocalDate date = LocalDate.of(2024, 12, 25); // Example date
+
+    //ChatGPT
+    // Create a formatter with a user-friendly format
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+    // Format the date and print it
+    String formattedDate = date.format(formatter);
+
     return (name + " " + amount + " " + unit + " " + "(costs " + cost + " euros per "
-        + unit.getMetric() + ") " + "(" + expiryDate + ")");
+        + unit.getMetric() + ") " + "(" + formattedDate + ")");
 
   }
 

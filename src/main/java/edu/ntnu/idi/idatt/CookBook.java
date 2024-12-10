@@ -100,7 +100,7 @@ public class CookBook {
         //All instances of food (all Grocery objects within recipe) must match the condition.
         .allMatch(food -> {
           // Use the search method to get all groceries with the same name
-          ArrayList<Grocery> matchingGroceries = Fridge.search(Fridge.overview(), food.getName());
+          ArrayList<Grocery> matchingGroceries = Utility.search(Fridge.overview(), food.getName());
 
           // Calculate the quantity of matching groceries
           float totalAmount = matchingGroceries.stream()
