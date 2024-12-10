@@ -18,17 +18,17 @@ public class Fridge {
 
 
   /**
-      * Creates a new grocery item. Ensures unit mismatch does not occur.
+   * Creates a new grocery item. Ensures unit mismatch does not occur.
    *
-   * @param name Grocery's name
-   * @param unit Grocery's unit (Unit enum)
-   * @param amount Grocery's amount
-   * @param cost Grocery's total cost
+   * @param name       Grocery's name
+   * @param unit       Grocery's unit (Unit enum)
+   * @param amount     Grocery's amount
+   * @param cost       Grocery's total cost
    * @param expiryDate Grocery's expiry date (LocalDate)
    * @return Boolean. If successful creation, true.
    */
   public static Boolean newGrocery(String name, Unit unit, float amount, float cost,
-                                LocalDate expiryDate) {
+                                   LocalDate expiryDate) {
     //ChatGPT
     Optional<Grocery> matchingProfile = groceryProfiles.stream()
         .filter(profile -> profile.getName().equalsIgnoreCase(name))
@@ -53,12 +53,12 @@ public class Fridge {
 
   /**
    * Adds a grocery profile.
+   *
    * @param name Grocery's name
    * @param unit Grocery's unit (Unit enum)
    */
   public static void createGroceryProfile(String name, Unit unit) {
     groceryProfiles.add(new Grocery(name, unit));
-
   }
 
   /**
@@ -79,7 +79,7 @@ public class Fridge {
    */
   public static UseStatus use(String name, float consume) {
 
-    ArrayList<Grocery> matchingGroceries = search(groceries, name);
+    ArrayList<Grocery> matchingGroceries = Utility.search(groceries, name);
 
     if (!matchingGroceries.isEmpty()) {
       matchingGroceries = matchingGroceries.stream()
@@ -116,17 +116,6 @@ public class Fridge {
     return UseStatus.ITEM_NOT_FOUND;
   }
 
-  /**
-   * Allows the user to search for an ingredient within the fridge.
-   *
-   * @param name * Ingredient's name.
-   * @return List of matching Grocery objects.
-   */
-  public static ArrayList<Grocery> search(ArrayList<Grocery> list, String name) {
-    return list.stream()
-        .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
-        .collect(Collectors.toCollection(ArrayList::new));
-  }
 
   /**
    * Returns a sorted overview of the groceries.
@@ -152,20 +141,6 @@ public class Fridge {
   }
 
   /**
-   * Calculates the total value of a given list of groceries.
-   *
-   * @param groceries The list of groceries to calculate the value for.
-   * @return The total value of the groceries as an integer.
-   */
-  public static int calculateValue(ArrayList<Grocery> groceries) {
-    float sum = 0;
-    for (Grocery grocery : groceries) {
-      sum += grocery.getAmount() * grocery.getCost();
-    }
-    return Math.round(sum);
-  }
-
-  /**
    * Returns ArrayList of items that will expire before a given date.
    *
    * @param date The date to compare against.
@@ -178,16 +153,13 @@ public class Fridge {
   }
 
   public static ArrayList<Grocery> getGroceryProfiles() {
-    return groceryProfiles;
+    return groceryProfiles.stream()
+        .sorted(Comparator.comparing(Grocery::getName))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  /**
-   * Deletes grocery profile.
-   *
-   * @param name Grocery profile to be searched for and deleted.
-   * @return Boolean, notifying of the operation's outcome.
-   */
-  public static boolean deleteProfile(String name) {
-    return groceryProfiles.removeIf(ingredient -> ingredient.getName().equalsIgnoreCase(name));
+  public static void clearGroceryProfiles() {
+    groceryProfiles.clear();
   }
+
 }

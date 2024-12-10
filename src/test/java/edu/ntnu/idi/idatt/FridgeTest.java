@@ -16,13 +16,26 @@ public class FridgeTest {
       Fridge.use(grocery.getName(), grocery.getAmount());
     }
 
-    Fridge.newGrocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1));
+    Fridge.clearGroceryProfiles();
 
+    Fridge.newGrocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1));
+  }
+
+  @Test
+  void getProfiles() {
+
+    //New item is created, but apple is added at the end of the list
+    Fridge.newGrocery("Apple", Unit.KILOGRAM, 1, 10, LocalDate.of(2024, 12, 1));
+    ArrayList<Grocery> profiles = Fridge.getGroceryProfiles();
+
+    //As getGroceryProfiles() returns an alphabetically sorted list, Apple should be found in the first index
+    assertEquals("Apple", profiles.get(0).getName());
+    assertEquals(Unit.KILOGRAM, profiles.get(0).getUnit());
+    assertEquals(2, profiles.size());
   }
 
   @Test
   void newGrocery() {
-
     //Creates a new grocery
     Fridge.newGrocery("White chocolate", Unit.GRAM, 100, 10, LocalDate.of(2020, 1, 1));
     ArrayList<Grocery> ingredients = Fridge.overview();
@@ -40,6 +53,47 @@ public class FridgeTest {
   }
 
   @Test
+  void secondGroceryValidUnit() {
+    //Since default item "Chocolate" is measured in grams, trying to make a new unit using kg should work
+    Fridge.newGrocery("Chocolate", Unit.KILOGRAM, 0.1f, 10, LocalDate.of(2025, 1, 1));
+
+    //Utilizes search method
+    ArrayList<Grocery> chocolate = Utility.search(Fridge.overview(), "Chocolate");
+
+    float sum = chocolate.stream()
+        .map(Grocery::getAmount)
+        .reduce(0f, Float::sum);
+
+    //100g + 0.1kg = 0.2kg
+    assertEquals(0.2, sum, 0.00001);
+
+  }
+
+  @Test
+  void secondGroceryInvalidUnit() {
+    //Since default item "Chocolate" is measured in grams, trying to make a new unit using litre should NOT work
+    //Returns false as the operation was aborted.
+    assertFalse(Fridge.newGrocery("Chocolate", Unit.LITRE, 0.1f, 10, LocalDate.of(2025, 1, 1)));
+
+    //Verifies that the grocery was not created. Only dummy default object should be here
+    assertEquals(1, Fridge.overview().size());
+    assertEquals("weight", Fridge.overview().get(0).getUnit().getMetricType());
+  }
+
+  //ChatGPT
+  @Test
+  void createGroceryProfile() {
+    Fridge.newGrocery("Orange", Unit.KILOGRAM, 2, 20, LocalDate.of(2025, 5, 1));
+    Grocery profile = Fridge.getGroceryProfiles().stream()
+        .filter(p -> p.getName().equalsIgnoreCase("Orange"))
+        .findFirst()
+        .orElse(null);
+
+    assertNotNull(profile, "Profile for Orange should be created");
+    assertEquals(Unit.KILOGRAM, profile.getUnit());
+  }
+
+  @Test
   void usePositive() {
 
     //Uses half the amount (0.5), then compares the returned output state
@@ -50,7 +104,6 @@ public class FridgeTest {
 
   @Test
   void useNotFound() {
-
     //Use outcome should be "ITEM_NOT_FOUND", as no food named "Vanilla" exists
     assertSame(Fridge.use("Vanilla", 0.5f), Fridge.UseStatus.ITEM_NOT_FOUND);
   }
@@ -102,7 +155,7 @@ public class FridgeTest {
   void searchPositive() {
 
     //Objects exists, so an identical objects is created with the same fields, and thus, to-string strings
-    assertEquals(Fridge.search(Fridge.overview(), "Chocolate").get(0).toString(),
+    assertEquals(Utility.search(Fridge.overview(), "Chocolate").get(0).toString(),
         new Grocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1)).toString());
   }
 
@@ -110,7 +163,7 @@ public class FridgeTest {
   void searchNegative() {
 
     //Searches for a name that doesn't exist, returned ArrayList should be empty
-    assertEquals(0, Fridge.search(Fridge.overview(),"Dark chocolate").size());
+    assertEquals(0, Utility.search(Fridge.overview(),"Dark chocolate").size());
   }
 
   @Test
@@ -146,10 +199,30 @@ public class FridgeTest {
     Fridge.newGrocery("Milk", Unit.LITRE, 2, 3, LocalDate.of(2025, 5, 1));
 
     //Value is calculated as a total for the given amount (as shown on the receipt)
-    int total = Fridge.calculateValue(Fridge.overview());
+    int total = Utility.calculateValue(Fridge.overview());
 
     //Result should be 13, as 1 * 10 + 2 * 1.5 = 13
     assertEquals(13, total);
+  }
+
+  @Test
+  void expiresBeforePositive() {
+    //Creates a date
+    LocalDate dateToCheck = LocalDate.of(2024, 12, 24);
+
+    //Creates a grocery that expires before the date above
+    LocalDate beforeDate = LocalDate.of(2024, 12, 23);
+
+    Fridge.newGrocery("Peas", Unit.GRAM, 100, 10, beforeDate);
+
+    //Runs the function, and saves to "expires" variable
+    ArrayList<Grocery> expires = Fridge.expiresBefore(dateToCheck);
+
+    //Only one item should pass the condition
+    assertEquals(1, expires.size());
+    //Dummy variable in place 0, therefore get place 1, and compare toString methods.
+    assertEquals(Fridge.overview().get(1).toString(), expires.get(0).toString());
+
   }
 
 }
