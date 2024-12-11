@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt;
 
-import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.service.FridgeFunctions;
+import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Unit;
 import edu.ntnu.idi.idatt.util.Utility;

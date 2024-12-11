@@ -1,12 +1,12 @@
 package edu.ntnu.idi.idatt.controller;
 
-
-import edu.ntnu.idi.idatt.FridgeFunctions;
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Recipe;
 import edu.ntnu.idi.idatt.model.Unit;
-import edu.ntnu.idi.idatt.service.CookBook;
-import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.service.CookBookFunctions;
+import edu.ntnu.idi.idatt.service.FridgeFunctions;
+import edu.ntnu.idi.idatt.storage.CookBook;
+import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.util.Utility;
 import edu.ntnu.idi.idatt.util.ValidateInput;
 import java.time.LocalDate;
@@ -15,7 +15,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
  * Class that handles the main user interface.
@@ -209,6 +208,10 @@ public class UserInterface {
 
       case ITEM_NOT_FOUND:
         System.out.println("No item under that name was found.");
+        break;
+
+      default:
+        System.out.println("Something unexpected happened.");
     }
   }
 
@@ -380,7 +383,7 @@ public class UserInterface {
     Recipe recipe = CookBook.search(choiceName);
 
     if (!(recipe == null)) {
-      boolean available = CookBook.recipeCheck(recipe);
+      boolean available = CookBookFunctions.recipeCheck(recipe);
 
       if (available) {
         recipe.getFoods()
@@ -422,11 +425,11 @@ public class UserInterface {
     String line = "";
     while (!line.equalsIgnoreCase("Done")) {
       line = ValidateInput.forceValidString(scanner);
-      String[] parts = line.split(",");
-
       if (line.equalsIgnoreCase("Done")) {
         continue;
       }
+
+      String[] parts = line.split(",");
 
       //Input verification:
       if (parts.length != 3) {
@@ -468,7 +471,6 @@ public class UserInterface {
             System.out.println("Unit mismatch. "
                 + "The existing unit for \"" + name + "\" is " + existingUnit + ".");
             System.out.println("Try again.");
-            continue;
           } else {
             ingredients.add(new Grocery(name, unit, amount));
           }
@@ -510,7 +512,7 @@ public class UserInterface {
    * Displays all recipes that can currently be made with the ingredients available in the fridge.
    */
   void handleAvailableRecipes() {
-    ArrayList<Recipe> availableRecipes = CookBook.recipeAvailability();
+    ArrayList<Recipe> availableRecipes = CookBookFunctions.recipeAvailability();
 
     if (!availableRecipes.isEmpty()) {
       System.out.println("With the ingredients you have, you are able to make:");
@@ -534,7 +536,7 @@ public class UserInterface {
     Recipe chosenRecipe = CookBook.search(choice);
 
     if (chosenRecipe != null) {
-      boolean possible = CookBook.recipeCheck(chosenRecipe);
+      boolean possible = CookBookFunctions.recipeCheck(chosenRecipe);
       if (possible) {
         System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
       } else {

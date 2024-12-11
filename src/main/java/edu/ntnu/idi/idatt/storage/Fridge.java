@@ -1,8 +1,8 @@
-package edu.ntnu.idi.idatt.service;
+package edu.ntnu.idi.idatt.storage;
 
-import edu.ntnu.idi.idatt.FridgeFunctions;
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Unit;
+import edu.ntnu.idi.idatt.service.FridgeFunctions;
 import edu.ntnu.idi.idatt.util.Utility;
 import java.time.LocalDate;
 import java.util.ArrayList;

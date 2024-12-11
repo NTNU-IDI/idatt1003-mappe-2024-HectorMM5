@@ -1,13 +1,16 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.service;
 
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Unit;
-import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.storage.Fridge;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+/**
+ * Main functionality tied to Fridge.
+ */
 public class FridgeFunctions {
   private static final ArrayList<Grocery> groceryProfiles = new ArrayList<>();
 
