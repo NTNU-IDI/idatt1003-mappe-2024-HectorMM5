@@ -115,7 +115,7 @@ public class UserInterface {
           break;
 
         case "/expiredOverview":
-          handleExpiredOverview();
+          handleExpiredOverview(scanner);
           break;
 
         case "/expiresBefore":
@@ -147,10 +147,10 @@ public class UserInterface {
    * @param scanner Scanner object to read user input.
    */
   private void handleNewItem(Scanner scanner) {
-    System.out.println("Write the name of the grocery.");
+    System.out.println("Write the name of the grocery:");
     final String name = ValidateInput.forceValidString(scanner);
 
-    System.out.println("Write the unit of the grocery.");
+    System.out.println("Write the unit of the grocery:");
     final Unit unit = Unit.forceValidUnit(scanner);
 
     System.out.println("Enter the amount (in numeric format):");
@@ -251,12 +251,51 @@ public class UserInterface {
    * Displays all the expired items currently in the fridge.
    * If no items have expired, notifies the user.
    */
-  private void handleExpiredOverview() {
+  private void handleExpiredOverview(Scanner scanner) {
     ArrayList<Grocery> expiredItems = FridgeService.dateOverview();
     Utility.displayList(expiredItems,
         "The following items are expired:",
         "None of your items have expired.");
 
+    if (!expiredItems.isEmpty()) {
+      System.out.println("Would you like to delete any items? (yes or no)");
+
+      String input = ValidateInput.forceValidString(scanner);
+
+      if (input.equalsIgnoreCase("yes")) {
+        AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
+        expiredItems.forEach(grocery ->
+            System.out.println(counter.getAndIncrement() + ". " + grocery.getName()));
+
+        System.out.println("\nPlease write in the number corresponding to the "
+            + "groceries you wish to delete. Type \"Done\" when done.");
+
+        input = ValidateInput.forceValidString(scanner);
+
+        while (!input.equalsIgnoreCase("Done")) {
+          //End the loop if "Done" is written in the first instance
+          if (input.equalsIgnoreCase("Done")) {
+            continue;
+          }
+
+          try {
+            int choice = Integer.parseInt(input);
+            if (choice >= 1 && choice <= expiredItems.size()) {
+              //Adjusts for 0-based order
+              Grocery chosenGrocery = expiredItems.get(choice - 1);
+              Fridge.use(chosenGrocery.getName(), chosenGrocery.getAmount());
+              System.out.println("Deleted " + chosenGrocery.getName() + ".");
+            } else {
+              System.out.println("Illegal choice, try again.");
+            }
+          } catch (NumberFormatException e) {
+            System.out.println("Invalid input, please enter a valid number");
+          }
+          input = ValidateInput.forceValidString(scanner);
+        }
+      }
+      System.out.println("Returned to Fridge menu.");
+    }
   }
 
   /**
@@ -365,7 +404,7 @@ public class UserInterface {
    * @param scanner Scanner object to read user input.
    */
   private void handleDeleteRecipe(Scanner scanner) {
-    System.out.println("Write the name of the recipe you want to delete");
+    System.out.println("Write the name of the recipe you want to delete:");
     String choiceName = ValidateInput.forceValidString(scanner);
 
     //If returns true (meaning successful search and deletion):
@@ -388,6 +427,8 @@ public class UserInterface {
       if (available) {
         recipe.getFoods()
             .forEach(grocery -> Fridge.use(grocery.getName(), grocery.getAmount()));
+
+        System.out.println("Recipe cooked, ingredients consumed.");
       } else {
         System.out.println("You cannot make this recipe right now.");
       }
@@ -586,12 +627,18 @@ public class UserInterface {
    * Recipes are numerated for better readability.
    */
   void handleAllRecipes() {
-    System.out.println("Here are all the registered recipes:");
     ArrayList<Recipe> recipes = CookBook.getRecipes();
 
-    AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
-    recipes.forEach(recipe ->
-            System.out.println(counter.getAndIncrement() + ". " + recipe.getName()));
+    if (!recipes.isEmpty()) {
+      System.out.println("Here are all the registered recipes:");
+
+      AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
+      recipes.forEach(recipe ->
+              System.out.println(counter.getAndIncrement() + ". " + recipe.getName()));
+    } else {
+      System.out.println("No recipes have been created yet.");
+    }
+
   }
 
   /**
