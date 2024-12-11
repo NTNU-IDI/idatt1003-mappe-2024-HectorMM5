@@ -1,5 +1,14 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.controller;
 
+
+import edu.ntnu.idi.idatt.FridgeFunctions;
+import edu.ntnu.idi.idatt.model.Grocery;
+import edu.ntnu.idi.idatt.model.Recipe;
+import edu.ntnu.idi.idatt.model.Unit;
+import edu.ntnu.idi.idatt.service.CookBook;
+import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.util.Utility;
+import edu.ntnu.idi.idatt.util.ValidateInput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -42,14 +51,13 @@ public class UserInterface {
    */
 
   public void start(Scanner scanner) {
-
-    System.out.println("\033[38;2;234;221;202m\nWrite \"1\" to access the fridge."
-        + "\nWrite \"2\" to access the cookbook."
-        + "\nWrite \"3\" to terminate the program.");
-
     int choice;
     boolean running = true;
     while (running) {
+      System.out.println("\033[38;2;234;221;202m\nWrite \"1\" to access the fridge."
+          + "\nWrite \"2\" to access the cookbook."
+          + "\nWrite \"3\" to terminate the program.");
+
       choice = ValidateInput.forceValidInteger(scanner);
 
       switch (choice) {
@@ -124,7 +132,7 @@ public class UserInterface {
           break;
 
         case "/back":
-          System.out.println("Exited cookbook.");
+          System.out.println("Exited FRIDGE.");
           running = false;
           break;
 
@@ -188,10 +196,19 @@ public class UserInterface {
     System.out.println("Write the amount you want to use:");
     float consume = ValidateInput.forceValidFloat(scanner);
 
-    try {
-      Fridge.use(groceryName, consume);
-    } catch (Exception e) {
-      System.out.println("The item was either not found, or you do not have enough of it.");
+    Fridge.UseStatus outcome = Fridge.use(groceryName, consume);
+
+    switch (outcome) {
+      case SUCCESS:
+        System.out.println("You have successfully used the grocery.");
+        break;
+
+      case INSUFFICIENT_AMOUNT:
+        System.out.println("You do not have enough to use this much of the grocery.");
+        break;
+
+      case ITEM_NOT_FOUND:
+        System.out.println("No item under that name was found.");
     }
   }
 
@@ -232,7 +249,7 @@ public class UserInterface {
    * If no items have expired, notifies the user.
    */
   private void handleExpiredOverview() {
-    ArrayList<Grocery> expiredItems = Fridge.dateOverview();
+    ArrayList<Grocery> expiredItems = FridgeFunctions.dateOverview();
     Utility.displayList(expiredItems,
         "The following items are expired:",
         "None of your items have expired.");
@@ -261,7 +278,7 @@ public class UserInterface {
 
     String dateToText = expiryDate.format(dateTimeFormatter);
 
-    ArrayList<Grocery> willExpire = Fridge.expiresBefore(expiryDate);
+    ArrayList<Grocery> willExpire = FridgeFunctions.expiresBefore(expiryDate);
 
     Utility.displayList(willExpire,
         null,
@@ -407,6 +424,10 @@ public class UserInterface {
       line = ValidateInput.forceValidString(scanner);
       String[] parts = line.split(",");
 
+      if (line.equalsIgnoreCase("Done")) {
+        continue;
+      }
+
       //Input verification:
       if (parts.length != 3) {
         //User input was invalid, new loop instance created
@@ -437,7 +458,7 @@ public class UserInterface {
 
         //Gets the profiles for all groceries so far
         ArrayList<Grocery> existingUnits =
-            Utility.search(Fridge.getGroceryProfiles(), parts[0].trim());
+            Utility.search(FridgeFunctions.getGroceryProfiles(), parts[0].trim());
 
         if (!existingUnits.isEmpty()) {
           //Only one object should be present in this list
@@ -455,7 +476,7 @@ public class UserInterface {
           //If no grocery profile was found, this is the first time the object is created
           //Therefore, add the ingredient and create the grocery profile
           ingredients.add(new Grocery(name, unit, amount));
-          Fridge.createGroceryProfile(name, unit);
+          FridgeFunctions.createGroceryProfile(name, unit);
         }
 
       } catch (NumberFormatException e) {
@@ -489,9 +510,15 @@ public class UserInterface {
    * Displays all recipes that can currently be made with the ingredients available in the fridge.
    */
   void handleAvailableRecipes() {
-    System.out.println("With the ingredients you have, you are able to make:");
-    for (Recipe recipe : CookBook.recipeAvailability()) {
-      System.out.println("  - " + recipe.getName());
+    ArrayList<Recipe> availableRecipes = CookBook.recipeAvailability();
+
+    if (!availableRecipes.isEmpty()) {
+      System.out.println("With the ingredients you have, you are able to make:");
+      for (Recipe recipe : availableRecipes) {
+        System.out.println("  - " + recipe.getName());
+      }
+    } else {
+      System.out.println("No available recipes.");
     }
   }
 
@@ -534,12 +561,12 @@ public class UserInterface {
       System.out.println("Recipe " + choice + " was not found.");
     } else {
       //Prints out a small presentation
-      System.out.println("Recipe " + recipe.getName() + " - " + recipe.getPortions() + " portions"
+      System.out.println(recipe.getName() + " - " + recipe.getPortions() + " portions"
           + "\n" + recipe.getDescription() + "\n\nYou need:");
 
       //For each specified ingredient, print out the name, amount and unit in a string.
       for (Grocery food : recipe.getFoods()) {
-        Utility.presentIngredient(food);
+        System.out.println(Utility.presentIngredient(food));
       }
 
       System.out.println("\nInstructions:");
@@ -561,8 +588,8 @@ public class UserInterface {
     ArrayList<Recipe> recipes = CookBook.getRecipes();
 
     AtomicInteger counter = new AtomicInteger(1); // Start numbering from 1
-    recipes.forEach(instruction ->
-            System.out.println(counter.getAndIncrement() + ". " + instruction));
+    recipes.forEach(recipe ->
+            System.out.println(counter.getAndIncrement() + ". " + recipe.getName()));
   }
 
   /**
@@ -591,8 +618,7 @@ public class UserInterface {
     System.out.println("     An overview of available COOKBOOK commands can be seen below:");
     System.out.println("------------------------------------------------------------------------");
     System.out.println("\n    - \"/createRecipe\" to create a new recipe.");
-    System.out.println("\n    - \"/cookRecipe\" to cook a recipe (consuming their items).");
-
+    System.out.println("    - \"/cookRecipe\" to cook a recipe (consuming their items).");
     System.out.println("    - \"/availableRecipes\" to view recipes you can make with the "
         + "ingredients in the fridge.");
     System.out.println("    - \"/checkRecipe\" to check if you have enough ingredients to"

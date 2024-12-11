@@ -1,5 +1,6 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.util;
 
+import edu.ntnu.idi.idatt.model.Grocery;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;

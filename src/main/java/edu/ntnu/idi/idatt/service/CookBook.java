@@ -1,6 +1,8 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.service;
 
-
+import edu.ntnu.idi.idatt.model.Grocery;
+import edu.ntnu.idi.idatt.model.Recipe;
+import edu.ntnu.idi.idatt.util.Utility;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -119,17 +121,11 @@ public class CookBook {
    * @return boolean, true if recipe was possible to make and was cooked
    */
   public static boolean cookRecipe(Recipe recipe) {
-
     if (recipeCheck(recipe)) {
-      for (Grocery grocery : recipe.getFoods()) {
-        Fridge.use(grocery.getName(), grocery.getAmount());
-
-      }
-
+      recipe.getFoods()
+          .forEach(grocery -> Fridge.use(grocery.getName(), grocery.getAmount()));
       return true;
-
-    } else {
-      return false;
     }
+    return false;
   }
 }

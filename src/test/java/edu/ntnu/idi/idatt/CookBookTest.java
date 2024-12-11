@@ -1,5 +1,13 @@
 package edu.ntnu.idi.idatt;
 
+import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.service.CookBook;
+import edu.ntnu.idi.idatt.model.Grocery;
+import edu.ntnu.idi.idatt.model.Recipe;
+import edu.ntnu.idi.idatt.model.Unit;
+
+
+import edu.ntnu.idi.idatt.util.Utility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
@@ -157,4 +165,46 @@ class CookBookTest {
     // If search function is successful, a reference to pastaRecipe will be created
     assertSame(CookBook.search("Pasta"), CookBook.getRecipes().get(0));
   }
+
+  @Test
+  void cookRecipe() {
+    //Create a pasta recipe
+    ArrayList<String> instructions = new ArrayList<>();
+    instructions.add("Step 1");
+    instructions.add("Step 2");
+    instructions.add("Step 3");
+
+    ArrayList<Grocery> ingredients = new ArrayList<>();
+    ingredients.add(new Grocery("Pasta", Unit.GRAM, 200.0f));
+    ingredients.add(new Grocery("Salt", Unit.GRAM, 10.0f));
+    ingredients.add(new Grocery("Tomato", Unit.KILOGRAM, 0.3f));
+
+    // Make a recipe
+    CookBook.createRecipe("Tomato pasta", "Simple pasta recipe.", instructions, ingredients, 2);
+
+    Fridge.newGrocery("Pasta", Unit.GRAM, 250.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Salt", Unit.GRAM, 20.0f, 10, LocalDate.of(2025, 1, 1));
+    Fridge.newGrocery("Tomato", Unit.KILOGRAM, 0.3f, 10, LocalDate.of(2025, 1, 1));
+
+    //Returns true if successful
+    assertTrue(CookBook.cookRecipe(CookBook.search("Tomato pasta")));
+
+    //We used all the tomatoes, so it should be deleted from the Fridge
+    assertTrue(Utility.search(Fridge.overview(), "Tomato").isEmpty());
+    //We used 200g of pasta, 50g should remain
+    assertEquals(0.050, Utility.search(Fridge.overview(), "Pasta").get(0).getAmount(), 0.0001);
+    //We used 10g of salt, 10g should remain
+    assertEquals(0.010, Utility.search(Fridge.overview(), "Salt").get(0).getAmount(), 0.0001);
+
+  }
+
+  @Test
+  void cookRecipeNegative() {
+    //Since tomato soup (default recipe) has no necessary ingredients in the fridge, return should be false
+
+    assertFalse(CookBook.cookRecipe(CookBook.search("Tomato soup")));
+
+  }
+
+
 }

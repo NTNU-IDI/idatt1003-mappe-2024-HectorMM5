@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt;
 
+import edu.ntnu.idi.idatt.controller.UserInterface;
 import java.util.Scanner;
 
 /**
