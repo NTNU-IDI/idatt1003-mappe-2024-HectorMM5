@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt;
 
-import edu.ntnu.idi.idatt.service.FridgeFunctions;
+import edu.ntnu.idi.idatt.service.FridgeService;
 import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Unit;
@@ -21,7 +21,7 @@ public class FridgeTest {
       Fridge.use(grocery.getName(), grocery.getAmount());
     }
 
-    FridgeFunctions.clearGroceryProfiles();
+    FridgeService.clearGroceryProfiles();
 
     Fridge.newGrocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1));
   }
@@ -31,7 +31,7 @@ public class FridgeTest {
 
     //New item is created, but apple is added at the end of the list
     Fridge.newGrocery("Apple", Unit.KILOGRAM, 1, 10, LocalDate.of(2024, 12, 1));
-    ArrayList<Grocery> profiles = FridgeFunctions.getGroceryProfiles();
+    ArrayList<Grocery> profiles = FridgeService.getGroceryProfiles();
 
     //As getGroceryProfiles() returns an alphabetically sorted list, Apple should be found in the first index
     assertEquals("Apple", profiles.get(0).getName());
@@ -89,7 +89,7 @@ public class FridgeTest {
   @Test
   void createGroceryProfileInnate() {
     Fridge.newGrocery("Orange", Unit.KILOGRAM, 2, 20, LocalDate.of(2025, 5, 1));
-    Grocery profile = FridgeFunctions.getGroceryProfiles().stream()
+    Grocery profile = FridgeService.getGroceryProfiles().stream()
         .filter(p -> p.getName().equalsIgnoreCase("Orange"))
         .findFirst()
         .orElse(null);
@@ -101,10 +101,10 @@ public class FridgeTest {
   @Test
   void createGroceryProfileSpecific() {
     // Create a new grocery profile
-    FridgeFunctions.createGroceryProfile("Apple", Unit.KILOGRAM);
+    FridgeService.createGroceryProfile("Apple", Unit.KILOGRAM);
 
     // Fetch the list of grocery profiles
-    ArrayList<Grocery> profiles = FridgeFunctions.getGroceryProfiles();
+    ArrayList<Grocery> profiles = FridgeService.getGroceryProfiles();
 
     // Ensure the profile was added correctly
     assertEquals(2, profiles.size(), "Profile size mismatch");
@@ -207,7 +207,7 @@ public class FridgeTest {
     //An expired item is added, as the default item is not expired
     Fridge.newGrocery("Milk", Unit.LITRE, 1, 5, LocalDate.of(2019, 12, 1)); // Expired
 
-    ArrayList<Grocery> dateOverview = FridgeFunctions.dateOverview();
+    ArrayList<Grocery> dateOverview = FridgeService.dateOverview();
 
     //Only the expired, newly added item should be in the returned ArrayList
     assertTrue(dateOverview.get(0).getName().equalsIgnoreCase("Milk"));
@@ -238,7 +238,7 @@ public class FridgeTest {
     Fridge.newGrocery("Peas", Unit.GRAM, 100, 10, beforeDate);
 
     //Runs the function, and saves to "expires" variable
-    ArrayList<Grocery> expires = FridgeFunctions.expiresBefore(dateToCheck);
+    ArrayList<Grocery> expires = FridgeService.expiresBefore(dateToCheck);
 
     //Only one item should pass the condition
     assertEquals(1, expires.size());

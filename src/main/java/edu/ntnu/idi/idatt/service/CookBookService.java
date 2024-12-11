@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * Main functionality for CookBook.
  */
-public class CookBookFunctions {
+public class CookBookService {
   /**
    * Checks if a given recipe can be made with the current items in the fridge.
    *

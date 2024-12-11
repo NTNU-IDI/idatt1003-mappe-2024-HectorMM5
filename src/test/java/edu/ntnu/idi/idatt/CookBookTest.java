@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt;
 
-import edu.ntnu.idi.idatt.service.CookBookFunctions;
+import edu.ntnu.idi.idatt.service.CookBookService;
 import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.storage.CookBook;
 import edu.ntnu.idi.idatt.model.Grocery;
@@ -78,9 +78,9 @@ class CookBookTest {
     //Since only Tomato soup has the necessary ingredients, only it should pass
     ArrayList<Recipe> recipes = CookBook.getRecipes();
     // Pasta recipe
-    assertFalse(CookBookFunctions.recipeCheck(recipes.get(0)));
+    assertFalse(CookBookService.recipeCheck(recipes.get(0)));
     // Tomato soup
-    assertTrue(CookBookFunctions.recipeCheck(recipes.get(1)));
+    assertTrue(CookBookService.recipeCheck(recipes.get(1)));
   }
 
   @Test
@@ -131,7 +131,7 @@ class CookBookTest {
     Fridge.newGrocery("Salt", Unit.GRAM, 20.0f, 10, LocalDate.of(2025, 1, 1));
 
     ArrayList<Recipe> recipes = CookBook.getRecipes();
-    ArrayList<Recipe> availableRecipes = CookBookFunctions.recipeAvailability();
+    ArrayList<Recipe> availableRecipes = CookBookService.recipeAvailability();
 
     // Pasta, ingredients were added so the recipe should appear
     assertTrue(availableRecipes.contains(recipes.get(0)));
@@ -188,7 +188,7 @@ class CookBookTest {
     Fridge.newGrocery("Tomato", Unit.KILOGRAM, 0.3f, 10, LocalDate.of(2025, 1, 1));
 
     //Returns true if successful
-    assertTrue(CookBookFunctions.cookRecipe(CookBook.search("Tomato pasta")));
+    assertTrue(CookBookService.cookRecipe(CookBook.search("Tomato pasta")));
 
     //We used all the tomatoes, so it should be deleted from the Fridge
     assertTrue(Utility.search(Fridge.overview(), "Tomato").isEmpty());
@@ -203,7 +203,7 @@ class CookBookTest {
   void cookRecipeNegative() {
     //Since tomato soup (default recipe) has no necessary ingredients in the fridge, return should be false
 
-    assertFalse(CookBookFunctions.cookRecipe(CookBook.search("Tomato soup")));
+    assertFalse(CookBookService.cookRecipe(CookBook.search("Tomato soup")));
 
   }
 
