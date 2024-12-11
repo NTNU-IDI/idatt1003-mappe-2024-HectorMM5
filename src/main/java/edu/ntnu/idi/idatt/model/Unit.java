@@ -1,5 +1,6 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.model;
 
+import edu.ntnu.idi.idatt.util.ValidateInput;
 import java.util.Scanner;
 
 /**
@@ -62,7 +63,7 @@ public enum Unit {
       }
 
       if (!isValid) {
-        System.out.println("Invalid unit. Please enter one of the following: g, kg, L, mL.");
+        System.out.println("Invalid unit. Please enter one of the following: g, kg, L, mL or pcs.");
       }
     }
     return metric; // Return the matching Unit enum

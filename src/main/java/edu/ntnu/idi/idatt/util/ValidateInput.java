@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt;
+package edu.ntnu.idi.idatt.util;
 
 import java.util.Scanner;
 
@@ -21,7 +21,8 @@ public class ValidateInput {
 
     while (!isValid) {
       input = scanner.nextLine();
-      if (!(input == null || input.trim().isEmpty())) {
+      //Regex from ChatGPT
+      if (input != null && input.trim().matches("[a-zA-Z ]+") && !input.trim().isEmpty()) {
         isValid = true;
       } else {
         System.out.println("Please enter a valid string.");

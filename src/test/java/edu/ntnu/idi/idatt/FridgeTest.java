@@ -1,7 +1,11 @@
 package edu.ntnu.idi.idatt;
 
-import static org.junit.jupiter.api.Assertions.*;
+import edu.ntnu.idi.idatt.service.Fridge;
+import edu.ntnu.idi.idatt.model.Grocery;
+import edu.ntnu.idi.idatt.model.Unit;
+import edu.ntnu.idi.idatt.util.Utility;
 
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +20,7 @@ public class FridgeTest {
       Fridge.use(grocery.getName(), grocery.getAmount());
     }
 
-    Fridge.clearGroceryProfiles();
+    FridgeFunctions.clearGroceryProfiles();
 
     Fridge.newGrocery("Chocolate", Unit.GRAM, 100, 10, LocalDate.of(2025, 1, 1));
   }
@@ -26,7 +30,7 @@ public class FridgeTest {
 
     //New item is created, but apple is added at the end of the list
     Fridge.newGrocery("Apple", Unit.KILOGRAM, 1, 10, LocalDate.of(2024, 12, 1));
-    ArrayList<Grocery> profiles = Fridge.getGroceryProfiles();
+    ArrayList<Grocery> profiles = FridgeFunctions.getGroceryProfiles();
 
     //As getGroceryProfiles() returns an alphabetically sorted list, Apple should be found in the first index
     assertEquals("Apple", profiles.get(0).getName());
@@ -82,15 +86,32 @@ public class FridgeTest {
 
   //ChatGPT
   @Test
-  void createGroceryProfile() {
+  void createGroceryProfileInnate() {
     Fridge.newGrocery("Orange", Unit.KILOGRAM, 2, 20, LocalDate.of(2025, 5, 1));
-    Grocery profile = Fridge.getGroceryProfiles().stream()
+    Grocery profile = FridgeFunctions.getGroceryProfiles().stream()
         .filter(p -> p.getName().equalsIgnoreCase("Orange"))
         .findFirst()
         .orElse(null);
 
     assertNotNull(profile, "Profile for Orange should be created");
     assertEquals(Unit.KILOGRAM, profile.getUnit());
+  }
+
+  @Test
+  void createGroceryProfileSpecific() {
+    // Create a new grocery profile
+    FridgeFunctions.createGroceryProfile("Apple", Unit.KILOGRAM);
+
+    // Fetch the list of grocery profiles
+    ArrayList<Grocery> profiles = FridgeFunctions.getGroceryProfiles();
+
+    // Ensure the profile was added correctly
+    assertEquals(2, profiles.size(), "Profile size mismatch");
+
+    // Verify the name and unit of the added profile
+    Grocery profile = profiles.get(0);
+    assertEquals("Apple", profile.getName(), "Profile name mismatch");
+    assertEquals(Unit.KILOGRAM, profile.getUnit(), "Profile unit mismatch");
   }
 
   @Test
@@ -185,7 +206,7 @@ public class FridgeTest {
     //An expired item is added, as the default item is not expired
     Fridge.newGrocery("Milk", Unit.LITRE, 1, 5, LocalDate.of(2019, 12, 1)); // Expired
 
-    ArrayList<Grocery> dateOverview = Fridge.dateOverview();
+    ArrayList<Grocery> dateOverview = FridgeFunctions.dateOverview();
 
     //Only the expired, newly added item should be in the returned ArrayList
     assertTrue(dateOverview.get(0).getName().equalsIgnoreCase("Milk"));
@@ -216,7 +237,7 @@ public class FridgeTest {
     Fridge.newGrocery("Peas", Unit.GRAM, 100, 10, beforeDate);
 
     //Runs the function, and saves to "expires" variable
-    ArrayList<Grocery> expires = Fridge.expiresBefore(dateToCheck);
+    ArrayList<Grocery> expires = FridgeFunctions.expiresBefore(dateToCheck);
 
     //Only one item should pass the condition
     assertEquals(1, expires.size());
@@ -224,5 +245,6 @@ public class FridgeTest {
     assertEquals(Fridge.overview().get(1).toString(), expires.get(0).toString());
 
   }
+
 
 }
