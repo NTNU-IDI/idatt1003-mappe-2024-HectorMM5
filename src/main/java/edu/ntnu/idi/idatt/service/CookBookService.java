@@ -6,6 +6,7 @@ import edu.ntnu.idi.idatt.storage.CookBook;
 import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.util.Utility;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Main functionality for CookBook.
@@ -56,17 +57,9 @@ public class CookBookService {
    * @return ArrayList with recipe objects.
    */
   public static ArrayList<Recipe> recipeAvailability() {
-
-    ArrayList<Recipe> availableRecipes = new ArrayList<>();
-
-    for (Recipe recipe : CookBook.getRecipes()) {
-      //If returned boolean is true
-      if (recipeCheck(recipe)) {
-        availableRecipes.add(recipe);
-      }
-    }
-
-    return availableRecipes;
+    return CookBook.getRecipes().stream()
+        .filter(CookBookService::recipeCheck) // Filter recipes that pass the recipeCheck method
+        .collect(Collectors.toCollection(ArrayList::new));
 
   }
 }
