@@ -2,7 +2,7 @@ package edu.ntnu.idi.idatt.storage;
 
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Unit;
-import edu.ntnu.idi.idatt.service.FridgeFunctions;
+import edu.ntnu.idi.idatt.service.FridgeService;
 import edu.ntnu.idi.idatt.util.Utility;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class Fridge {
   public static Boolean newGrocery(String name, Unit unit, float amount, float cost,
                                    LocalDate expiryDate) {
     //ChatGPT
-    Optional<Grocery> matchingProfile = FridgeFunctions.getGroceryProfiles().stream()
+    Optional<Grocery> matchingProfile = FridgeService.getGroceryProfiles().stream()
         .filter(profile -> profile.getName().equalsIgnoreCase(name))
         .findFirst();
 
@@ -59,7 +59,7 @@ public class Fridge {
     }
     //If no item under this name has been created, create item and item profile.
     groceries.add(new Grocery(name, unit, amount, cost, expiryDate));
-    FridgeFunctions.createGroceryProfile(name, unit);
+    FridgeService.createGroceryProfile(name, unit);
     return true;
 
   }

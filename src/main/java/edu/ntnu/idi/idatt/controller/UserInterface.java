@@ -3,8 +3,8 @@ package edu.ntnu.idi.idatt.controller;
 import edu.ntnu.idi.idatt.model.Grocery;
 import edu.ntnu.idi.idatt.model.Recipe;
 import edu.ntnu.idi.idatt.model.Unit;
-import edu.ntnu.idi.idatt.service.CookBookFunctions;
-import edu.ntnu.idi.idatt.service.FridgeFunctions;
+import edu.ntnu.idi.idatt.service.CookBookService;
+import edu.ntnu.idi.idatt.service.FridgeService;
 import edu.ntnu.idi.idatt.storage.CookBook;
 import edu.ntnu.idi.idatt.storage.Fridge;
 import edu.ntnu.idi.idatt.util.Utility;
@@ -252,7 +252,7 @@ public class UserInterface {
    * If no items have expired, notifies the user.
    */
   private void handleExpiredOverview() {
-    ArrayList<Grocery> expiredItems = FridgeFunctions.dateOverview();
+    ArrayList<Grocery> expiredItems = FridgeService.dateOverview();
     Utility.displayList(expiredItems,
         "The following items are expired:",
         "None of your items have expired.");
@@ -281,7 +281,7 @@ public class UserInterface {
 
     String dateToText = expiryDate.format(dateTimeFormatter);
 
-    ArrayList<Grocery> willExpire = FridgeFunctions.expiresBefore(expiryDate);
+    ArrayList<Grocery> willExpire = FridgeService.expiresBefore(expiryDate);
 
     Utility.displayList(willExpire,
         null,
@@ -383,7 +383,7 @@ public class UserInterface {
     Recipe recipe = CookBook.search(choiceName);
 
     if (!(recipe == null)) {
-      boolean available = CookBookFunctions.recipeCheck(recipe);
+      boolean available = CookBookService.recipeCheck(recipe);
 
       if (available) {
         recipe.getFoods()
@@ -461,7 +461,7 @@ public class UserInterface {
 
         //Gets the profiles for all groceries so far
         ArrayList<Grocery> existingUnits =
-            Utility.search(FridgeFunctions.getGroceryProfiles(), parts[0].trim());
+            Utility.search(FridgeService.getGroceryProfiles(), parts[0].trim());
 
         if (!existingUnits.isEmpty()) {
           //Only one object should be present in this list
@@ -478,7 +478,7 @@ public class UserInterface {
           //If no grocery profile was found, this is the first time the object is created
           //Therefore, add the ingredient and create the grocery profile
           ingredients.add(new Grocery(name, unit, amount));
-          FridgeFunctions.createGroceryProfile(name, unit);
+          FridgeService.createGroceryProfile(name, unit);
         }
 
       } catch (NumberFormatException e) {
@@ -512,7 +512,7 @@ public class UserInterface {
    * Displays all recipes that can currently be made with the ingredients available in the fridge.
    */
   void handleAvailableRecipes() {
-    ArrayList<Recipe> availableRecipes = CookBookFunctions.recipeAvailability();
+    ArrayList<Recipe> availableRecipes = CookBookService.recipeAvailability();
 
     if (!availableRecipes.isEmpty()) {
       System.out.println("With the ingredients you have, you are able to make:");
@@ -536,7 +536,7 @@ public class UserInterface {
     Recipe chosenRecipe = CookBook.search(choice);
 
     if (chosenRecipe != null) {
-      boolean possible = CookBookFunctions.recipeCheck(chosenRecipe);
+      boolean possible = CookBookService.recipeCheck(chosenRecipe);
       if (possible) {
         System.out.println("Recipe " + chosenRecipe.getName() + " is possible to make.");
       } else {

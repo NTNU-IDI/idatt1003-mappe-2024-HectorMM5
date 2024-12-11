@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Main functionality tied to Fridge.
  */
-public class FridgeFunctions {
+public class FridgeService {
   private static final ArrayList<Grocery> groceryProfiles = new ArrayList<>();
 
   public static ArrayList<Grocery> getGroceryProfiles() {
