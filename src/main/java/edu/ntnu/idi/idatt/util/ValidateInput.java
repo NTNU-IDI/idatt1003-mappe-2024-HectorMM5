@@ -22,7 +22,7 @@ public class ValidateInput {
     while (!isValid) {
       input = scanner.nextLine();
       //Regex from ChatGPT
-      if (input != null && input.trim().matches("[a-zA-Z ]+") && !input.trim().isEmpty()) {
+      if (input != null && input.matches("[a-zA-Z0-9 .,/]+") && !input.trim().isEmpty()) {
         isValid = true;
       } else {
         System.out.println("Please enter a valid string.");

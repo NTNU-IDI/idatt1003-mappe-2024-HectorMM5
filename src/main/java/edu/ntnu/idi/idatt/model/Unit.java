@@ -4,7 +4,7 @@ import edu.ntnu.idi.idatt.util.ValidateInput;
 import java.util.Scanner;
 
 /**
- * Represent a unit (metric type) for groceries. Goal is to avoid the user
+ * Represents a unit (metric type) for groceries. Goal is to avoid the user
  */
 
 public enum Unit {
@@ -37,6 +37,12 @@ public enum Unit {
     return this.metricType;
   }
 
+  /**
+   * Searches for and returns a unit enum. If not found, throws error.
+   *
+   * @param metric Unit to be searched for.
+   * @return Unit enum object.
+   */
   public static Unit searchMetric(String metric) {
     for (Unit unit : Unit.values()) {
       if (unit.metric.equalsIgnoreCase(metric.trim())) {
@@ -46,13 +52,19 @@ public enum Unit {
     throw new IllegalArgumentException("Invalid unit: " + metric);
   }
 
+  /**
+   * Forces the user to input a valid, previously specified unit.
+   *
+   * @param scanner Scanner object to access user input.
+   * @return The approved unit enum object.
+   */
   public static Unit forceValidUnit(Scanner scanner) {
     Unit metric = null;
     String input;
     boolean isValid = false;
 
     while (!isValid) {
-      input = ValidateInput.forceValidString(scanner); // Assuming forceValidString is implemented elsewhere
+      input = ValidateInput.forceValidString(scanner);
 
       for (Unit type : Unit.values()) {
         if (type.metric.equalsIgnoreCase(input.trim())) {

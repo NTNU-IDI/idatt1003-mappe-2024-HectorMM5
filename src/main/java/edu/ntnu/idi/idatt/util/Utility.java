@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * Stores a series of utility functions, automating repetitive tasks.
+ */
 public class Utility {
 
   /**
@@ -33,6 +36,13 @@ public class Utility {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
+  /**
+   * Displays user-friendly information of every Grocery object in a given list.
+   *
+   * @param list List to be presented.
+   * @param notification Notification before the content is presented.
+   * @param ifEmpty Notification in case the given list is empty.
+   */
   public static void displayList(ArrayList<Grocery> list, String notification, String ifEmpty) {
     if (!list.isEmpty()) {
       if (!(notification == null)) {
@@ -80,15 +90,8 @@ public class Utility {
    * @return A formatted string representation of the ingredient.
    */
   public static String presentIngredient(Grocery grocery) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("    - ");
-    builder.append(grocery.getAmount());
-    builder.append(" ");
-    builder.append(grocery.getUnit());
-    builder.append(" ");
-    builder.append(grocery.getName());
 
-    return builder.toString();
+    return "    - " + grocery.getAmount() + " " + grocery.getUnit() + " " + grocery.getName();
   }
 
 }
